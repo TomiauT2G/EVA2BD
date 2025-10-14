@@ -503,11 +503,11 @@
     function duplicateTreatment() {
         if (confirm('¿Está seguro de que desea duplicar este tratamiento?')) {
             const params = new URLSearchParams();
-            params.append('nombre', '{{ tratamiento.nombre }} (Copia)');
-            params.append('descripcion', '{{ tratamiento.descripcion }}');
+            params.append('nombre', '{{ tratamiento.nombre|escapejs }} (Copia)');
+            params.append('descripcion', '{{ tratamiento.descripcion|escapejs }}');
             params.append('duracion', '{{ tratamiento.duracion_dias }}');
             {% if tratamiento.instrucciones %}
-            params.append('instrucciones', '{{ tratamiento.instrucciones }}');
+            params.append('instrucciones', '{{ tratamiento.instrucciones|escapejs }}');
             {% endif %}
             
             window.location.href = '{% url "tratamientos_create" %}?' + params.toString();

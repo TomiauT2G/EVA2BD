@@ -15,7 +15,7 @@
         <i class="bi bi-pencil me-2"></i>
         Editar
     </a>
-    <button type="button" class="btn btn-danger" onclick="deleteEspecialidad({{ especialidad.pk }}, '{{ especialidad.nombre }}')">
+    <button type="button" class="btn btn-danger" onclick="deleteEspecialidad({{ especialidad.pk }}, &quot;{{ especialidad.nombre }}&quot;)">
         <i class="bi bi-trash me-2"></i>
         Eliminar
     </button>
@@ -191,7 +191,7 @@
                         <span class="small">{{ especialidad.medicos.count }}/10</span>
                     </div>
                     <div class="progress" style="height: 6px;">
-                        <div class="progress-bar" style="width: {{ especialidad.medicos.count|mul:10 }}%"></div>
+                        <div class="progress-bar" style="width: {% widthratio especialidad.medicos.count 10 100 %}%"></div>
                     </div>
                 </div>
             </div>
