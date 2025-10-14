@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block title %}Consulta Médica #{{ consulta.id }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Consulta Médica #{{ consulta.id }}{% endblock %}
+{% block page_description %}Detalles completos de la consulta médica{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'consultas_edit' consulta.id %}" class="btn btn-primary me-2">
+    <i class="bi bi-pencil-square me-2"></i>
+    Editar
+</a>
+<a href="{% url 'consultas_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Consultation Header -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clipboard-data me-2"></i>
+                        Información de la Consulta
+                    </h5>
+                    <span class="badge bg-primary fs-6">ID: {{ consulta.id }}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person me-2"></i>
+                            Información del Paciente
+                        </h6>
+                        <div class="mb-3">
+                            <strong>Nombre Completo:</strong><br>
+                            <span class="fs-5">{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>RUT:</strong> {{ consulta.paciente.rut }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Fecha de Nacimiento:</strong> {{ consulta.paciente.fecha_nacimiento|date:"d/m/Y" }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Teléfono:</strong> {{ consulta.paciente.telefono }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Dirección:</strong> {{ consulta.paciente.direccion }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-success mb-3">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Información del Médico
+                        </h6>
+                        <div class="mb-3">
+                            <strong>Nombre Completo:</strong><br>
+                            <span class="fs-5">Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>RUT:</strong> {{ consulta.medico.rut }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Especialidad:</strong> 
+                            <span class="badge bg-info">{{ consulta.medico.especialidad.nombre }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Teléfono:</strong> {{ consulta.medico.telefono }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Consultation Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    Detalles de la Consulta
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-calendar3 text-primary me-3 fs-4"></i>
+                            <div>
+                                <strong>Fecha y Hora:</strong><br>
+                                <span class="fs-5">{{ consulta.fecha_consulta|date:"l, d \d\e F \d\e Y" }}</span><br>
+                                <span class="text-muted">{{ consulta.fecha_consulta|date:"H:i" }} hrs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-heart-pulse text-success me-3 fs-4"></i>
+                            <div>
+                                <strong>Especialidad:</strong><br>
+                                <span class="badge bg-success fs-6">{{ consulta.medico.especialidad.nombre }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="bi bi-chat-text me-2"></i>
+                        Motivo de Consulta
+                    </h6>
+                    <div class="bg-light p-3 rounded">
+                        {{ consulta.motivo_consulta|linebreaks }}
+                    </div>
+                </div>
+                
+                {% if consulta.diagnostico %}
+                <div class="mb-4">
+                    <h6 class="text-success border-bottom pb-2 mb-3">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Diagnóstico
+                    </h6>
+                    <div class="bg-light p-3 rounded">
+                        {{ consulta.diagnostico|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if consulta.observaciones %}
+                <div class="mb-4">
+                    <h6 class="text-info border-bottom pb-2 mb-3">
+                        <i class="bi bi-journal-text me-2"></i>
+                        Observaciones Adicionales
+                    </h6>
+                    <div class="bg-light p-3 rounded">
+                        {{ consulta.observaciones|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Related Treatments -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-heart-pulse-fill me-2"></i>
+                        Tratamientos Asociados
+                    </h5>
+                    <a href="{% url 'tratamientos_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Agregar Tratamiento
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if consulta.tratamiento_set.all %}
+                    <div class="row">
+                        {% for tratamiento in consulta.tratamiento_set.all %}
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h6 class="text-primary mb-2">{{ tratamiento.nombre }}</h6>
+                                <p class="mb-1"><strong>Descripción:</strong> {{ tratamiento.descripcion|truncatechars:100 }}</p>
+                                <p class="mb-1"><strong>Duración:</strong> {{ tratamiento.duracion_dias }} días</p>
+                                <div class="mt-2">
+                                    <a href="{% url 'tratamientos_detail' tratamiento.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>
+                                        Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-heart-pulse fs-1 mb-3"></i>
+                        <p>No hay tratamientos asociados a esta consulta</p>
+                        <a href="{% url 'tratamientos_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-success">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Agregar Primer Tratamiento
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Related Prescriptions -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-prescription2 me-2"></i>
+                        Recetas Médicas
+                    </h5>
+                    <a href="{% url 'recetas_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Crear Receta
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if consulta.recetamedica_set.all %}
+                    <div class="row">
+                        {% for receta in consulta.recetamedica_set.all %}
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h6 class="text-info mb-2">Receta #{{ receta.id }}</h6>
+                                <p class="mb-1"><strong>Fecha:</strong> {{ receta.fecha_receta|date:"d/m/Y" }}</p>
+                                <p class="mb-1"><strong>Medicamentos:</strong> {{ receta.medicamento_set.count }}</p>
+                                <div class="mt-2">
+                                    <a href="{% url 'recetas_detail' receta.id %}" class="btn btn-outline-info btn-sm">
+                                        <i class="bi bi-eye me-1"></i>
+                                        Ver Receta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-prescription2 fs-1 mb-3"></i>
+                        <p>No hay recetas médicas asociadas a esta consulta</p>
+                        <a href="{% url 'recetas_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-info">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Crear Primera Receta
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>
+                    Acciones Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'consultas_edit' consulta.id %}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar Consulta
+                    </a>
+                    <a href="{% url 'tratamientos_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-success">
+                        <i class="bi bi-heart-pulse me-2"></i>
+                        Agregar Tratamiento
+                    </a>
+                    <a href="{% url 'recetas_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-info">
+                        <i class="bi bi-prescription2 me-2"></i>
+                        Crear Receta Médica
+                    </a>
+                    <hr>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Consulta
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Consultation Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Resumen
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ consulta.tratamiento_set.count }}</h4>
+                            <small class="text-muted">Tratamientos</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info mb-1">{{ consulta.recetamedica_set.count }}</h4>
+                        <small class="text-muted">Recetas</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Patient History -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Historial del Paciente
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if consulta.paciente.consultamedica_set.all|length > 1 %}
+                    <p class="mb-3">
+                        <strong>Total de consultas:</strong> 
+                        <span class="badge bg-primary">{{ consulta.paciente.consultamedica_set.count }}</span>
+                    </p>
+                    
+                    <h6 class="mb-2">Consultas Recientes:</h6>
+                    <div class="list-group list-group-flush">
+                        {% for consulta_hist in consulta.paciente.consultamedica_set.all|slice:":5" %}
+                            {% if consulta_hist.id != consulta.id %}
+                            <div class="list-group-item px-0 py-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <small class="text-muted">{{ consulta_hist.fecha_consulta|date:"d/m/Y" }}</small><br>
+                                        <small>{{ consulta_hist.medico.especialidad.nombre }}</small>
+                                    </div>
+                                    <a href="{% url 'consultas_detail' consulta_hist.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-clock-history fs-3 mb-2"></i>
+                        <p class="mb-0">Primera consulta del paciente</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar esta consulta médica?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminarán también todos los tratamientos y recetas asociadas.
+                </div>
+                <div class="bg-light p-3 rounded">
+                    <strong>Consulta:</strong> #{{ consulta.id }}<br>
+                    <strong>Paciente:</strong> {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}<br>
+                    <strong>Fecha:</strong> {{ consulta.fecha_consulta|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'consultas_delete' consulta.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Consulta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

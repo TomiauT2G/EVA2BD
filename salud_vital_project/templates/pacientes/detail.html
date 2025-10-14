@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ paciente.nombre }} {{ paciente.apellido }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Detalles del Paciente{% endblock %}
+{% block page_description %}Información completa de {{ paciente.nombre }} {{ paciente.apellido }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    <a href="{% url 'pacientes_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Volver a Lista
+    </a>
+    <a href="{% url 'pacientes_edit' paciente.pk %}" class="btn btn-outline-warning">
+        <i class="bi bi-pencil me-2"></i>
+        Editar
+    </a>
+    <a href="{% url 'consultas_create' %}?paciente={{ paciente.pk }}" class="btn btn-success">
+        <i class="bi bi-plus-circle me-2"></i>
+        Nueva Consulta
+    </a>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="bi bi-trash me-2"></i>
+        Eliminar
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Patient Information -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Información Personal
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-person me-2"></i>
+                                    Nombre Completo:
+                                </td>
+                                <td>{{ paciente.nombre }} {{ paciente.apellido }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-card-text me-2"></i>
+                                    Documento:
+                                </td>
+                                <td>{{ paciente.get_tipo_documento_display }} {{ paciente.numero_documento }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-gender-ambiguous me-2"></i>
+                                    Género:
+                                </td>
+                                <td>{{ paciente.get_genero_display }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-calendar me-2"></i>
+                                    Fecha de Nacimiento:
+                                </td>
+                                <td>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-hourglass me-2"></i>
+                                    Edad:
+                                </td>
+                                <td><span class="badge bg-primary">{{ paciente.edad }} años</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-envelope me-2"></i>
+                                    Email:
+                                </td>
+                                <td>
+                                    <a href="mailto:{{ paciente.email }}" class="text-decoration-none">
+                                        {{ paciente.email }}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-telephone me-2"></i>
+                                    Teléfono:
+                                </td>
+                                <td>
+                                    <a href="tel:{{ paciente.telefono }}" class="text-decoration-none">
+                                        {{ paciente.telefono }}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    Dirección:
+                                </td>
+                                <td>{{ paciente.direccion }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-heart me-2"></i>
+                                    Estado Civil:
+                                </td>
+                                <td>{{ paciente.get_estado_civil_display|default:"No especificado" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-droplet me-2"></i>
+                                    Grupo Sanguíneo:
+                                </td>
+                                <td>
+                                    {% if paciente.grupo_sanguineo %}
+                                        <span class="badge bg-danger">{{ paciente.grupo_sanguineo }}</span>
+                                    {% else %}
+                                        <span class="text-muted">No especificado</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if paciente.alergias %}
+                    <div class="alert alert-warning mt-3">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Alergias Conocidas
+                        </h6>
+                        <p class="mb-0">{{ paciente.alergias }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Medical History -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clipboard-data me-2"></i>
+                    Historial de Consultas
+                </h5>
+                <a href="{% url 'consultas_create' %}?paciente={{ paciente.pk }}" class="btn btn-sm btn-success">
+                    <i class="bi bi-plus me-1"></i>
+                    Nueva Consulta
+                </a>
+            </div>
+            <div class="card-body">
+                {% if paciente.consultas.all %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Médico</th>
+                                    <th>Especialidad</th>
+                                    <th>Motivo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in paciente.consultas.all|slice:":10" %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold">{{ consulta.fecha|date:"d/m/Y" }}</span><br>
+                                            <small class="text-muted">{{ consulta.fecha|time:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-person-badge me-2 text-primary"></i>
+                                                <div>
+                                                    <div class="fw-bold">{{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</div>
+                                                    <small class="text-muted">{{ consulta.medico.numero_licencia }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ consulta.medico.especialidad.nombre }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ consulta.motivo_consulta }}">
+                                                {{ consulta.motivo_consulta }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'consultas_detail' consulta.pk %}" class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{% url 'consultas_edit' consulta.pk %}" class="btn btn-outline-warning btn-sm">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if paciente.consultas.count > 10 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'consultas_list' %}?paciente={{ paciente.pk }}" class="btn btn-outline-primary">
+                                Ver todas las consultas ({{ paciente.consultas.count }})
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-clipboard-x display-1 text-muted"></i>
+                        <h5 class="text-muted mt-3">Sin consultas registradas</h5>
+                        <p class="text-muted">Este paciente aún no tiene consultas médicas registradas.</p>
+                        <a href="{% url 'consultas_create' %}?paciente={{ paciente.pk }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Registrar Primera Consulta
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics and Quick Actions -->
+    <div class="col-md-4">
+        <!-- Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Estadísticas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-primary mb-1">{{ paciente.consultas.count }}</h3>
+                            <small class="text-muted">Consultas</small>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-success mb-1">{{ paciente.recetas.count }}</h3>
+                            <small class="text-muted">Recetas</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h3 class="text-info mb-1">{{ paciente.tratamientos.count }}</h3>
+                            <small class="text-muted">Tratamientos</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h3 class="text-warning mb-1">
+                                {% if paciente.consultas.exists %}
+                                    {{ paciente.consultas.first.fecha|timesince }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h3>
+                            <small class="text-muted">Última consulta</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'consultas_create' %}?paciente={{ paciente.pk }}" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Nueva Consulta
+                    </a>
+                    <a href="{% url 'recetas_create' %}?paciente={{ paciente.pk }}" class="btn btn-info">
+                        <i class="bi bi-prescription2 me-2"></i>
+                        Nueva Receta
+                    </a>
+                    <a href="{% url 'tratamientos_create' %}?paciente={{ paciente.pk }}" class="btn btn-warning">
+                        <i class="bi bi-bandaid me-2"></i>
+                        Nuevo Tratamiento
+                    </a>
+                    <hr>
+                    <a href="{% url 'pacientes_edit' paciente.pk %}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil me-2"></i>
+                        Editar Información
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if paciente.consultas.exists %}
+                    <div class="timeline">
+                        {% for consulta in paciente.consultas.all|slice:":5" %}
+                            <div class="timeline-item mb-3">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Consulta Médica</h6>
+                                    <p class="mb-1 text-muted small">
+                                        {{ consulta.fecha|date:"d/m/Y H:i" }}
+                                    </p>
+                                    <p class="mb-0 small">
+                                        Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">Sin actividad reciente</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar al paciente <strong>{{ paciente.nombre }} {{ paciente.apellido }}</strong>?</p>
+                
+                {% if paciente.consultas.count > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Advertencia:</strong> Este paciente tiene {{ paciente.consultas.count }} consulta{{ paciente.consultas.count|pluralize }} registrada{{ paciente.consultas.count|pluralize }}. 
+                        Al eliminar el paciente, también se eliminarán todos sus registros médicos.
+                    </div>
+                {% endif %}
+                
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'pacientes_delete' paciente.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Paciente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .timeline-item {
+        position: relative;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -25px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: -21px;
+        top: 15px;
+        width: 2px;
+        height: calc(100% + 10px);
+        background-color: #dee2e6;
+    }

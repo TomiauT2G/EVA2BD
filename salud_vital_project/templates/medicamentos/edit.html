@@ -1,0 +1,573 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Medicamento - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Editar Medicamento{% endblock %}
+{% block page_description %}Modificar información del medicamento: {{ medicamento.nombre }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'medicamentos_detail' medicamento.id %}" class="btn btn-outline-info me-2">
+    <i class="bi bi-eye me-2"></i>
+    Ver Detalles
+</a>
+<a href="{% url 'medicamentos_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Editar Medicamento: {{ medicamento.nombre }}
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Información Básica
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                Nombre Comercial *
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nombre.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.principio_activo.id_for_label }}" class="form-label">
+                                <i class="bi bi-prescription2 me-1"></i>
+                                Principio Activo *
+                            </label>
+                            {{ form.principio_activo }}
+                            {% if form.principio_activo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.principio_activo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Descripción
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.descripcion.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Pharmaceutical Details -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-success border-bottom pb-2 mb-3">
+                                <i class="bi bi-capsule me-2"></i>
+                                Detalles Farmacéuticos
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                <i class="bi bi-collection me-1"></i>
+                                Tipo de Medicamento *
+                            </label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.tipo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.concentracion.id_for_label }}" class="form-label">
+                                <i class="bi bi-speedometer me-1"></i>
+                                Concentración *
+                            </label>
+                            {{ form.concentracion }}
+                            {% if form.concentracion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.concentracion.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ej: 500mg, 250mg/5ml, 10%
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.laboratorio.id_for_label }}" class="form-label">
+                                <i class="bi bi-building me-1"></i>
+                                Laboratorio
+                            </label>
+                            {{ form.laboratorio }}
+                            {% if form.laboratorio.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.laboratorio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Prescription and Usage -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-warning border-bottom pb-2 mb-3">
+                                <i class="bi bi-prescription me-2"></i>
+                                Prescripción y Uso
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.requiere_receta }}
+                                <label class="form-check-label" for="{{ form.requiere_receta.id_for_label }}">
+                                    <i class="bi bi-prescription me-1"></i>
+                                    Requiere Receta Médica
+                                </label>
+                            </div>
+                            {% if form.requiere_receta.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.requiere_receta.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Marque si el medicamento requiere prescripción médica
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.via_administracion.id_for_label }}" class="form-label">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                Vía de Administración
+                            </label>
+                            {{ form.via_administracion }}
+                            {% if form.via_administracion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.via_administracion.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.contraindicaciones.id_for_label }}" class="form-label">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Contraindicaciones
+                            </label>
+                            {{ form.contraindicaciones }}
+                            {% if form.contraindicaciones.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.contraindicaciones.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Situaciones en las que no se debe usar este medicamento
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.efectos_secundarios.id_for_label }}" class="form-label">
+                                <i class="bi bi-shield-exclamation me-1"></i>
+                                Efectos Secundarios
+                            </label>
+                            {{ form.efectos_secundarios }}
+                            {% if form.efectos_secundarios.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.efectos_secundarios.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Change Log -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-info border-bottom pb-2 mb-3">
+                                <i class="bi bi-clock-history me-2"></i>
+                                Registro de Cambios
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-plus me-1"></i>
+                                Fecha de Registro
+                            </label>
+                            <input type="text" class="form-control" value="{{ medicamento.fecha_creacion|date:'d/m/Y H:i' }}" readonly>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                Última Modificación
+                            </label>
+                            <input type="text" class="form-control" value="{{ medicamento.fecha_actualizacion|date:'d/m/Y H:i' }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-eye me-2"></i>
+                    Vista Previa
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="medication-preview-icon" id="medication-icon">
+                        <i class="bi bi-capsule fs-1 text-muted"></i>
+                    </div>
+                </div>
+                
+                <div id="preview-content">
+                    <p class="text-muted text-center">Vista previa del medicamento</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Change History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Historial de Cambios
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Medicamento Registrado</h6>
+                            <p class="timeline-text">{{ medicamento.fecha_creacion|date:'d/m/Y H:i' }}</p>
+                        </div>
+                    </div>
+                    {% if medicamento.fecha_actualizacion != medicamento.fecha_creacion %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Última Actualización</h6>
+                            <p class="timeline-text">{{ medicamento.fecha_actualizacion|date:'d/m/Y H:i' }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>
+                    Información Relacionada
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-prescription me-2"></i>
+                        Ver Recetas (0)
+                    </a>
+                    <a href="#" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-heart-pulse me-2"></i>
+                        Ver Tratamientos (0)
+                    </a>
+                    <a href="#" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Estadísticas de Uso
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Safety Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Información de Seguridad
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning alert-sm">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Importante:</strong> Verifique siempre las contraindicaciones y efectos secundarios antes de prescribir.
+                </div>
+                
+                {% if medicamento.requiere_receta %}
+                <div class="alert alert-info alert-sm">
+                    <i class="bi bi-prescription me-2"></i>
+                    <strong>Receta Requerida:</strong> Este medicamento requiere prescripción médica.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .medication-preview-icon {
+        transition: all 0.3s ease;
+    }
+    
+    .needs-validation .form-control:invalid {
+        border-color: #dc3545;
+    }
+    
+    .needs-validation .form-control:valid {
+        border-color: #198754;
+    }
+    
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -23px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #dee2e6;
+    }
+    
+    .timeline-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .timeline-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .alert-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.needs-validation');
+        const previewContent = document.getElementById('preview-content');
+        const medicationIcon = document.getElementById('medication-icon');
+        
+        // Form validation
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Real-time preview
+        function updatePreview() {
+            const nombre = document.getElementById('{{ form.nombre.id_for_label }}').value;
+            const principioActivo = document.getElementById('{{ form.principio_activo.id_for_label }}').value;
+            const tipo = document.getElementById('{{ form.tipo.id_for_label }}').value;
+            const concentracion = document.getElementById('{{ form.concentracion.id_for_label }}').value;
+            const laboratorio = document.getElementById('{{ form.laboratorio.id_for_label }}').value;
+            const requiereReceta = document.getElementById('{{ form.requiere_receta.id_for_label }}').checked;
+            
+            // Update icon based on type
+            updateIcon(tipo);
+            
+            previewContent.innerHTML = `
+                <div class="text-start">
+                    ${nombre ? `<p class="mb-1"><strong>Nombre:</strong> ${nombre}</p>` : ''}
+                    ${principioActivo ? `<p class="mb-1"><strong>Principio Activo:</strong> ${principioActivo}</p>` : ''}
+                    ${tipo ? `<p class="mb-1"><strong>Tipo:</strong> ${getTypeDisplay(tipo)}</p>` : ''}
+                    ${concentracion ? `<p class="mb-1"><strong>Concentración:</strong> ${concentracion}</p>` : ''}
+                    ${laboratorio ? `<p class="mb-1"><strong>Laboratorio:</strong> ${laboratorio}</p>` : ''}
+                    <p class="mb-1">
+                        <strong>Receta:</strong> 
+                        <span class="badge ${requiereReceta ? 'bg-warning' : 'bg-success'}">
+                            ${requiereReceta ? 'Requerida' : 'No requerida'}
+                        </span>
+                    </p>
+                </div>
+            `;
+        }
+        
+        function updateIcon(tipo) {
+            let iconClass = 'bi bi-capsule fs-1 text-muted';
+            
+            switch(tipo) {
+                case 'tableta':
+                    iconClass = 'bi bi-circle-fill fs-1 text-primary';
+                    break;
+                case 'capsula':
+                    iconClass = 'bi bi-capsule fs-1 text-success';
+                    break;
+                case 'jarabe':
+                    iconClass = 'bi bi-cup fs-1 text-warning';
+                    break;
+                case 'inyeccion':
+                    iconClass = 'bi bi-bandaid fs-1 text-danger';
+                    break;
+                case 'crema':
+                    iconClass = 'bi bi-droplet fs-1 text-info';
+                    break;
+                case 'gotas':
+                    iconClass = 'bi bi-droplet-half fs-1 text-primary';
+                    break;
+                case 'spray':
+                    iconClass = 'bi bi-cloud fs-1 text-secondary';
+                    break;
+                default:
+                    iconClass = 'bi bi-prescription2 fs-1 text-info';
+            }
+            
+            medicationIcon.innerHTML = `<i class="${iconClass}"></i>`;
+        }
+        
+        function getTypeDisplay(tipo) {
+            const types = {
+                'tableta': 'Tableta',
+                'capsula': 'Cápsula',
+                'jarabe': 'Jarabe',
+                'inyeccion': 'Inyección',
+                'crema': 'Crema',
+                'gotas': 'Gotas',
+                'spray': 'Spray',
+                'otro': 'Otro'
+            };
+            return types[tipo] || tipo;
+        }
+        
+        // Add event listeners for real-time preview
+        ['{{ form.nombre.id_for_label }}', '{{ form.principio_activo.id_for_label }}', '{{ form.tipo.id_for_label }}', '{{ form.concentracion.id_for_label }}', '{{ form.laboratorio.id_for_label }}', '{{ form.requiere_receta.id_for_label }}'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updatePreview);
+                element.addEventListener('change', updatePreview);
+            }
+        });
+        
+        // Initial preview update
+        updatePreview();
+        
+        // Track changes for unsaved changes warning
+        let hasUnsavedChanges = false;
+        const formElements = form.querySelectorAll('input, select, textarea');
+        
+        formElements.forEach(element => {
+            element.addEventListener('input', function() {
+                hasUnsavedChanges = true;
+            });
+        });
+        
+        // Warn about unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+        
+        // Clear warning on form submit
+        form.addEventListener('submit', function() {
+            hasUnsavedChanges = false;
+        });
+    });
+</script>
+{% endblock %}

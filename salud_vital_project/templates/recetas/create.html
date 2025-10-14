@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Receta Médica - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Nueva Receta Médica{% endblock %}
+{% block page_description %}Crear una nueva prescripción médica{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-prescription2 me-2"></i>
+                    Información de la Receta
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Información básica -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="consulta" class="form-label">Consulta Médica *</label>
+                            <select class="form-select" id="consulta" name="consulta" required>
+                                <option value="">Seleccionar consulta...</option>
+                                {% for consulta in consultas %}
+                                    <option value="{{ consulta.id }}" 
+                                            data-paciente="{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}"
+                                            data-medico="Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}"
+                                            data-fecha="{{ consulta.fecha|date:'d/m/Y' }}"
+                                            data-diagnostico="{{ consulta.diagnostico }}">
+                                        {{ consulta.fecha|date:"d/m/Y" }} - {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }} (Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione una consulta médica.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento *</label>
+                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese la fecha de vencimiento.
+                            </div>
+                            <small class="form-text text-muted">
+                                La receta será válida hasta esta fecha
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Información de la consulta seleccionada -->
+                    <div id="consulta-info" class="alert alert-info d-none mb-4">
+                        <h6><i class="bi bi-info-circle me-2"></i>Información de la Consulta</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Paciente:</strong> <span id="info-paciente"></span><br>
+                                <strong>Médico:</strong> <span id="info-medico"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Fecha:</strong> <span id="info-fecha"></span><br>
+                                <strong>Diagnóstico:</strong> <span id="info-diagnostico"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medicamentos -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Medicamentos Prescritos</h6>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMedicamento()">
+                                <i class="bi bi-plus-circle me-1"></i>Agregar Medicamento
+                            </button>
+                        </div>
+                        
+                        <div id="medicamentos-container">
+                            <!-- Los medicamentos se agregarán dinámicamente aquí -->
+                        </div>
+                        
+                        <div class="text-muted text-center py-3" id="no-medicamentos">
+                            <i class="bi bi-capsule fs-1 d-block mb-2"></i>
+                            <p>No hay medicamentos agregados</p>
+                            <button type="button" class="btn btn-primary" onclick="addMedicamento()">
+                                <i class="bi bi-plus-circle me-2"></i>Agregar primer medicamento
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-4">
+                        <label for="observaciones" class="form-label">Observaciones Generales</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" 
+                                  placeholder="Instrucciones generales, precauciones especiales, etc."></textarea>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'recetas_list' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Crear Receta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Vista previa de la receta -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-eye me-2"></i>Vista Previa
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="preview-content">
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-prescription2 fs-1 d-block mb-2"></i>
+                        <p>Seleccione una consulta para ver la vista previa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ayuda -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-question-circle me-2"></i>Ayuda
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <p><strong>Consejos:</strong></p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check text-success me-2"></i>Seleccione la consulta médica correspondiente</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Agregue todos los medicamentos necesarios</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Especifique dosis y frecuencia claramente</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Incluya observaciones importantes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para medicamento -->
+<template id="medicamento-template">
+    <div class="card mb-3 medicamento-item">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h6 class="card-title mb-0">Medicamento <span class="medicamento-number"></span></h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Medicamento *</label>
+                    <select class="form-select medicamento-select" name="medicamento[]" required>
+                        <option value="">Seleccionar medicamento...</option>
+                        {% for medicamento in medicamentos %}
+                            <option value="{{ medicamento.id }}" 
+                                    data-nombre="{{ medicamento.nombre_comercial }}"
+                                    data-principio="{{ medicamento.principio_activo }}"
+                                    data-concentracion="{{ medicamento.concentracion }}"
+                                    data-tipo="{{ medicamento.tipo }}">
+                                {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Dosis *</label>
+                    <input type="text" class="form-control" name="dosis[]" 
+                           placeholder="ej: 500mg, 1 comprimido" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Frecuencia *</label>
+                    <select class="form-select" name="frecuencia[]" required>
+                        <option value="">Seleccionar frecuencia...</option>
+                        <option value="Cada 4 horas">Cada 4 horas</option>
+                        <option value="Cada 6 horas">Cada 6 horas</option>
+                        <option value="Cada 8 horas">Cada 8 horas</option>
+                        <option value="Cada 12 horas">Cada 12 horas</option>
+                        <option value="Una vez al día">Una vez al día</option>
+                        <option value="Dos veces al día">Dos veces al día</option>
+                        <option value="Tres veces al día">Tres veces al día</option>
+                        <option value="Según necesidad">Según necesidad</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Duración</label>
+                    <input type="text" class="form-control" name="duracion[]" 
+                           placeholder="ej: 7 días, 2 semanas">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Instrucciones Especiales</label>
+                    <textarea class="form-control" name="instrucciones[]" rows="2" 
+                              placeholder="Tomar con alimentos, antes de dormir, etc."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .medicamento-item {
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .card-title {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .preview-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .preview-header {
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .medicamento-preview {
+        background-color: white;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--secondary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let medicamentoCounter = 0;
+    
+    // Configurar fecha mínima (hoy) y máxima (1 año)
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setFullYear(today.getFullYear() + 1);
+        
+        const fechaVencimiento = document.getElementById('fecha_vencimiento');
+        fechaVencimiento.min = today.toISOString().split('T')[0];
+        fechaVencimiento.max = maxDate.toISOString().split('T')[0];
+        
+        // Establecer fecha por defecto (30 días)
+        const defaultDate = new Date();
+        defaultDate.setDate(today.getDate() + 30);
+        fechaVencimiento.value = defaultDate.toISOString().split('T')[0];
+    });
+    
+    // Manejar selección de consulta
+    document.getElementById('consulta').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const infoDiv = document.getElementById('consulta-info');
+        
+        if (selectedOption.value) {
+            document.getElementById('info-paciente').textContent = selectedOption.dataset.paciente;
+            document.getElementById('info-medico').textContent = selectedOption.dataset.medico;
+            document.getElementById('info-fecha').textContent = selectedOption.dataset.fecha;
+            document.getElementById('info-diagnostico').textContent = selectedOption.dataset.diagnostico;
+            infoDiv.classList.remove('d-none');
+            updatePreview();
+        } else {
+            infoDiv.classList.add('d-none');
+            updatePreview();
+        }
+    });
+    
+    function addMedicamento() {
+        medicamentoCounter++;
+        const template = document.getElementById('medicamento-template');
+        const clone = template.content.cloneNode(true);
+        
+        // Actualizar número del medicamento
+        clone.querySelector('.medicamento-number').textContent = medicamentoCounter;
+        
+        // Agregar event listeners
+        const selects = clone.querySelectorAll('select, input, textarea');
+        selects.forEach(element => {
+            element.addEventListener('change', updatePreview);
+            element.addEventListener('input', updatePreview);
+        });
+        
+        document.getElementById('medicamentos-container').appendChild(clone);
+        document.getElementById('no-medicamentos').style.display = 'none';
+        updatePreview();
+    }
+    
+    function removeMedicamento(button) {
+        button.closest('.medicamento-item').remove();
+        
+        // Renumerar medicamentos
+        const items = document.querySelectorAll('.medicamento-item');
+        items.forEach((item, index) => {
+            item.querySelector('.medicamento-number').textContent = index + 1;
+        });
+        
+        if (items.length === 0) {
+            document.getElementById('no-medicamentos').style.display = 'block';
+            medicamentoCounter = 0;
+        }
+        
+        updatePreview();
+    }
+    
+    function updatePreview() {
+        const consulta = document.getElementById('consulta');
+        const fechaVencimiento = document.getElementById('fecha_vencimiento');
+        const observaciones = document.getElementById('observaciones');
+        const previewContent = document.getElementById('preview-content');
+        
+        if (!consulta.value) {
+            previewContent.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-prescription2 fs-1 d-block mb-2"></i>
+                    <p>Seleccione una consulta para ver la vista previa</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const selectedOption = consulta.options[consulta.selectedIndex];
+        const medicamentos = document.querySelectorAll('.medicamento-item');
+        
+        let medicamentosHtml = '';
+        medicamentos.forEach((item, index) => {
+            const medicamentoSelect = item.querySelector('.medicamento-select');
+            const dosis = item.querySelector('input[name="dosis[]"]').value;
+            const frecuencia = item.querySelector('select[name="frecuencia[]"]').value;
+            const duracion = item.querySelector('input[name="duracion[]"]').value;
+            const instrucciones = item.querySelector('textarea[name="instrucciones[]"]').value;
+            
+            if (medicamentoSelect.value) {
+                const medicamentoOption = medicamentoSelect.options[medicamentoSelect.selectedIndex];
+                medicamentosHtml += `
+                    <div class="medicamento-preview">
+                        <strong>${medicamentoOption.dataset.nombre}</strong>
+                        <br><small class="text-muted">${medicamentoOption.dataset.principio} - ${medicamentoOption.dataset.concentracion}</small>
+                        ${dosis ? `<br><strong>Dosis:</strong> ${dosis}` : ''}
+                        ${frecuencia ? `<br><strong>Frecuencia:</strong> ${frecuencia}` : ''}
+                        ${duracion ? `<br><strong>Duración:</strong> ${duracion}` : ''}
+                        ${instrucciones ? `<br><strong>Instrucciones:</strong> ${instrucciones}` : ''}
+                    </div>
+                `;
+            }
+        });
+        
+        previewContent.innerHTML = `
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h6 class="mb-0">RECETA MÉDICA</h6>
+                </div>
+                <p><strong>Paciente:</strong> ${selectedOption.dataset.paciente}</p>
+                <p><strong>Médico:</strong> ${selectedOption.dataset.medico}</p>
+                <p><strong>Fecha:</strong> ${selectedOption.dataset.fecha}</p>
+                <p><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
+                
+                <h6 class="mt-3 mb-2">Medicamentos:</h6>
+                ${medicamentosHtml || '<p class="text-muted">No hay medicamentos agregados</p>'}
+                
+                ${observaciones.value ? `<h6 class="mt-3 mb-2">Observaciones:</h6><p>${observaciones.value}</p>` : ''}
+            </div>
+        `;
+    }
+    
+    // Event listeners para actualizar vista previa
+    document.getElementById('fecha_vencimiento').addEventListener('change', updatePreview);
+    document.getElementById('observaciones').addEventListener('input', updatePreview);
+</script>
+{% endblock %}

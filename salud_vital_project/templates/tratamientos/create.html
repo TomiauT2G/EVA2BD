@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Tratamiento - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Nuevo Tratamiento{% endblock %}
+{% block page_description %}Registrar un nuevo tratamiento médico{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'tratamientos_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clipboard-plus me-2"></i>
+                    Registrar Nuevo Tratamiento
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Consultation Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="bi bi-clipboard-data me-2"></i>
+                                Información de la Consulta
+                            </h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.consulta.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                Consulta Médica *
+                            </label>
+                            {{ form.consulta }}
+                            {% if form.consulta.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.consulta.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Seleccione la consulta médica asociada a este tratamiento
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Treatment Details -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-success border-bottom pb-2 mb-3">
+                                <i class="bi bi-heart-pulse me-2"></i>
+                                Detalles del Tratamiento
+                            </h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                Nombre del Tratamiento *
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nombre.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Descripción del Tratamiento *
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.descripcion.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.duracion_dias.id_for_label }}" class="form-label">
+                                <i class="bi bi-clock me-1"></i>
+                                Duración (días) *
+                            </label>
+                            {{ form.duracion_dias }}
+                            {% if form.duracion_dias.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.duracion_dias.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                Fecha de Inicio
+                            </label>
+                            {{ form.fecha_inicio }}
+                            {% if form.fecha_inicio.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.fecha_inicio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Si no se especifica, se puede definir posteriormente
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.instrucciones.id_for_label }}" class="form-label">
+                                <i class="bi bi-list-check me-1"></i>
+                                Instrucciones Especiales
+                            </label>
+                            {{ form.instrucciones }}
+                            {% if form.instrucciones.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.instrucciones.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Registrar Tratamiento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-eye me-2"></i>
+                    Vista Previa
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="avatar-circle bg-success text-white d-inline-flex align-items-center justify-content-center">
+                        <i class="bi bi-heart-pulse fs-3"></i>
+                    </div>
+                </div>
+                
+                <div id="preview-content">
+                    <p class="text-muted text-center">Complete el formulario para ver la vista previa</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Información Importante
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        Los campos marcados con * son obligatorios
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        La consulta debe estar previamente registrada
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        La fecha de inicio puede definirse posteriormente
+                    </li>
+                    <li class="mb-0">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        Podrá agregar medicamentos después del registro
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Duration Calculator -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-calculator me-2"></i>
+                    Calculadora de Duración
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(7)">
+                            1 Semana
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(14)">
+                            2 Semanas
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(30)">
+                            1 Mes
+                        </button>
+                    </div>
+                </div>
+                <div class="row text-center mt-2">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(60)">
+                            2 Meses
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(90)">
+                            3 Meses
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+    
+    .needs-validation .form-control:invalid {
+        border-color: #dc3545;
+    }
+    
+    .needs-validation .form-control:valid {
+        border-color: #198754;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.needs-validation');
+        const previewContent = document.getElementById('preview-content');
+        const consultaSelect = document.getElementById('{{ form.consulta.id_for_label }}');
+        
+        // Form validation
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Real-time preview
+        function updatePreview() {
+            const consulta = document.getElementById('{{ form.consulta.id_for_label }}');
+            const consultaText = consulta.options[consulta.selectedIndex]?.text || '';
+            const nombre = document.getElementById('{{ form.nombre.id_for_label }}').value;
+            const descripcion = document.getElementById('{{ form.descripcion.id_for_label }}').value;
+            const duracion = document.getElementById('{{ form.duracion_dias.id_for_label }}').value;
+            const fechaInicio = document.getElementById('{{ form.fecha_inicio.id_for_label }}').value;
+            
+            if (nombre || consultaText || duracion) {
+                let fechaFin = '';
+                if (fechaInicio && duracion) {
+                    const inicio = new Date(fechaInicio);
+                    const fin = new Date(inicio);
+                    fin.setDate(fin.getDate() + parseInt(duracion));
+                    fechaFin = fin.toLocaleDateString('es-ES');
+                }
+                
+                previewContent.innerHTML = `
+                    <div class="text-start">
+                        ${nombre ? `<p class="mb-1"><strong>Tratamiento:</strong> ${nombre}</p>` : ''}
+                        ${consultaText ? `<p class="mb-1"><strong>Consulta:</strong> ${consultaText.substring(0, 50)}${consultaText.length > 50 ? '...' : ''}</p>` : ''}
+                        ${duracion ? `<p class="mb-1"><strong>Duración:</strong> ${duracion} días</p>` : ''}
+                        ${fechaInicio ? `<p class="mb-1"><strong>Inicio:</strong> ${new Date(fechaInicio).toLocaleDateString('es-ES')}</p>` : ''}
+                        ${fechaFin ? `<p class="mb-1"><strong>Fin estimada:</strong> ${fechaFin}</p>` : ''}
+                        ${descripcion ? `<p class="mb-1"><strong>Descripción:</strong> ${descripcion.substring(0, 50)}${descripcion.length > 50 ? '...' : ''}</p>` : ''}
+                    </div>
+                `;
+            } else {
+                previewContent.innerHTML = '<p class="text-muted text-center">Complete el formulario para ver la vista previa</p>';
+            }
+        }
+        
+        // Add event listeners for real-time preview
+        ['{{ form.consulta.id_for_label }}', '{{ form.nombre.id_for_label }}', '{{ form.descripcion.id_for_label }}', '{{ form.duracion_dias.id_for_label }}', '{{ form.fecha_inicio.id_for_label }}'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updatePreview);
+                element.addEventListener('change', updatePreview);
+            }
+        });
+        
+        // Set default start date to today
+        const fechaInicioInput = document.getElementById('{{ form.fecha_inicio.id_for_label }}');
+        if (fechaInicioInput && !fechaInicioInput.value) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            fechaInicioInput.value = `${year}-${month}-${day}`;
+        }
+        
+        // Pre-select consultation if provided in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const consultaParam = urlParams.get('consulta');
+        if (consultaParam && consultaSelect) {
+            consultaSelect.value = consultaParam;
+            updatePreview();
+        }
+    });
+    
+    // Duration calculator functions
+    function setDuration(days) {
+        const duracionInput = document.getElementById('{{ form.duracion_dias.id_for_label }}');
+        if (duracionInput) {
+            duracionInput.value = days;
+            duracionInput.dispatchEvent(new Event('input'));
+        }
+    }
+</script>
+{% endblock %}

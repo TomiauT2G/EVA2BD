@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Consulta Médica - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Nueva Consulta Médica{% endblock %}
+{% block page_description %}Registrar una nueva consulta médica en el sistema{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'consultas_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clipboard-plus me-2"></i>
+                    Registrar Nueva Consulta Médica
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Patient and Doctor Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="bi bi-people me-2"></i>
+                                Información de Participantes
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.paciente.id_for_label }}" class="form-label">
+                                <i class="bi bi-person me-1"></i>
+                                Paciente *
+                            </label>
+                            {{ form.paciente }}
+                            {% if form.paciente.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.paciente.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <a href="{% url 'pacientes_create' %}" class="text-decoration-none" target="_blank">
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    ¿No encuentras el paciente? Crear nuevo
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.medico.id_for_label }}" class="form-label">
+                                <i class="bi bi-person-badge me-1"></i>
+                                Médico *
+                            </label>
+                            {{ form.medico }}
+                            {% if form.medico.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.medico.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <a href="{% url 'medicos_create' %}" class="text-decoration-none" target="_blank">
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    ¿No encuentras el médico? Crear nuevo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Consultation Details -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="bi bi-clipboard-data me-2"></i>
+                                Detalles de la Consulta
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.fecha_consulta.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar me-1"></i>
+                                Fecha y Hora de Consulta *
+                            </label>
+                            {{ form.fecha_consulta }}
+                            {% if form.fecha_consulta.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.fecha_consulta.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="especialidad_display" class="form-label">
+                                <i class="bi bi-heart-pulse me-1"></i>
+                                Especialidad
+                            </label>
+                            <input type="text" class="form-control" id="especialidad_display" 
+                                   placeholder="Se mostrará automáticamente" readonly>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Se asigna automáticamente según el médico seleccionado
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.motivo_consulta.id_for_label }}" class="form-label">
+                                <i class="bi bi-chat-text me-1"></i>
+                                Motivo de Consulta *
+                            </label>
+                            {{ form.motivo_consulta }}
+                            {% if form.motivo_consulta.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.motivo_consulta.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.diagnostico.id_for_label }}" class="form-label">
+                                <i class="bi bi-clipboard-check me-1"></i>
+                                Diagnóstico
+                            </label>
+                            {{ form.diagnostico }}
+                            {% if form.diagnostico.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.diagnostico.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Puede completarse durante o después de la consulta
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Observaciones Adicionales
+                            </label>
+                            {{ form.observaciones }}
+                            {% if form.observaciones.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.observaciones.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Registrar Consulta
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-eye me-2"></i>
+                    Vista Previa
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="avatar-circle bg-primary text-white d-inline-flex align-items-center justify-content-center">
+                        <i class="bi bi-clipboard-data fs-3"></i>
+                    </div>
+                </div>
+                
+                <div id="preview-content">
+                    <p class="text-muted text-center">Complete el formulario para ver la vista previa</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Información Importante
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        Los campos marcados con * son obligatorios
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        El paciente y médico deben estar registrados
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        El diagnóstico puede completarse posteriormente
+                    </li>
+                    <li class="mb-0">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        Podrá agregar tratamientos después del registro
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+    
+    .needs-validation .form-control:invalid {
+        border-color: #dc3545;
+    }
+    
+    .needs-validation .form-control:valid {
+        border-color: #198754;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.needs-validation');
+        const previewContent = document.getElementById('preview-content');
+        const medicoSelect = document.getElementById('{{ form.medico.id_for_label }}');
+        const especialidadDisplay = document.getElementById('especialidad_display');
+        
+        // Form validation
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Update specialty when doctor changes
+        medicoSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                // Extract specialty from option text (assuming format: "Dr. Name - Specialty")
+                const optionText = selectedOption.text;
+                const specialtyMatch = optionText.match(/- (.+)$/);
+                if (specialtyMatch) {
+                    especialidadDisplay.value = specialtyMatch[1];
+                } else {
+                    especialidadDisplay.value = 'Especialidad no especificada';
+                }
+            } else {
+                especialidadDisplay.value = '';
+            }
+            updatePreview();
+        });
+        
+        // Real-time preview
+        function updatePreview() {
+            const paciente = document.getElementById('{{ form.paciente.id_for_label }}');
+            const pacienteText = paciente.options[paciente.selectedIndex]?.text || '';
+            const medico = document.getElementById('{{ form.medico.id_for_label }}');
+            const medicoText = medico.options[medico.selectedIndex]?.text || '';
+            const fecha = document.getElementById('{{ form.fecha_consulta.id_for_label }}').value;
+            const motivo = document.getElementById('{{ form.motivo_consulta.id_for_label }}').value;
+            const diagnostico = document.getElementById('{{ form.diagnostico.id_for_label }}').value;
+            
+            if (pacienteText || medicoText || fecha) {
+                previewContent.innerHTML = `
+                    <div class="text-start">
+                        ${pacienteText ? `<p class="mb-1"><strong>Paciente:</strong> ${pacienteText}</p>` : ''}
+                        ${medicoText ? `<p class="mb-1"><strong>Médico:</strong> ${medicoText}</p>` : ''}
+                        ${fecha ? `<p class="mb-1"><strong>Fecha:</strong> ${new Date(fecha).toLocaleString('es-ES')}</p>` : ''}
+                        ${motivo ? `<p class="mb-1"><strong>Motivo:</strong> ${motivo.substring(0, 50)}${motivo.length > 50 ? '...' : ''}</p>` : ''}
+                        ${diagnostico ? `<p class="mb-1"><strong>Diagnóstico:</strong> ${diagnostico.substring(0, 50)}${diagnostico.length > 50 ? '...' : ''}</p>` : ''}
+                    </div>
+                `;
+            } else {
+                previewContent.innerHTML = '<p class="text-muted text-center">Complete el formulario para ver la vista previa</p>';
+            }
+        }
+        
+        // Add event listeners for real-time preview
+        ['{{ form.paciente.id_for_label }}', '{{ form.medico.id_for_label }}', '{{ form.fecha_consulta.id_for_label }}', '{{ form.motivo_consulta.id_for_label }}', '{{ form.diagnostico.id_for_label }}'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updatePreview);
+                element.addEventListener('change', updatePreview);
+            }
+        });
+        
+        // Set default date to now
+        const fechaInput = document.getElementById('{{ form.fecha_consulta.id_for_label }}');
+        if (fechaInput && !fechaInput.value) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            fechaInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+    });
+</script>
+{% endblock %}

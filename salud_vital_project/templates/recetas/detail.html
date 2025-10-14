@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+
+{% block title %}Receta Médica - {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Receta Médica{% endblock %}
+{% block page_description %}Detalles de la prescripción médica{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    <a href="{% url 'recetas_edit' receta.id %}" class="btn btn-warning">
+        <i class="bi bi-pencil me-2"></i>Editar
+    </a>
+    <button type="button" class="btn btn-info" onclick="printReceta()">
+        <i class="bi bi-printer me-2"></i>Imprimir
+    </button>
+    <a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Información principal de la receta -->
+        <div class="card mb-4" id="receta-content">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-prescription2 me-2"></i>
+                        Receta Médica #{{ receta.id }}
+                    </h5>
+                    <div class="d-flex gap-2">
+                        {% if receta.fecha_vencimiento >= today %}
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-check-circle me-1"></i>Vigente
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger fs-6">
+                                <i class="bi bi-x-circle me-1"></i>Vencida
+                            </span>
+                        {% endif %}
+                        
+                        {% if receta.fecha_vencimiento <= warning_date and receta.fecha_vencimiento >= today %}
+                            <span class="badge bg-warning fs-6">
+                                <i class="bi bi-clock me-1"></i>Por vencer
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Información del paciente y médico -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-primary mb-3">
+                                <i class="bi bi-person me-2"></i>Información del Paciente
+                            </h6>
+                            <div class="patient-info">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
+                                        <i class="bi bi-person text-white fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</h5>
+                                        <p class="text-muted mb-0">RUT: {{ receta.consulta.paciente.rut }}</p>
+                                    </div>
+                                </div>
+                                <div class="patient-details">
+                                    <p><strong>Fecha de Nacimiento:</strong> {{ receta.consulta.paciente.fecha_nacimiento|date:"d/m/Y" }}</p>
+                                    <p><strong>Teléfono:</strong> {{ receta.consulta.paciente.telefono }}</p>
+                                    <p><strong>Email:</strong> {{ receta.consulta.paciente.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-success mb-3">
+                                <i class="bi bi-person-badge me-2"></i>Médico Prescriptor
+                            </h6>
+                            <div class="doctor-info">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="avatar-lg bg-success rounded-circle d-flex align-items-center justify-content-center me-3">
+                                        <i class="bi bi-person-badge text-white fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</h5>
+                                        <p class="text-muted mb-0">{{ receta.consulta.medico.especialidad.nombre }}</p>
+                                    </div>
+                                </div>
+                                <div class="doctor-details">
+                                    <p><strong>Registro Médico:</strong> {{ receta.consulta.medico.numero_registro }}</p>
+                                    <p><strong>Teléfono:</strong> {{ receta.consulta.medico.telefono }}</p>
+                                    <p><strong>Email:</strong> {{ receta.consulta.medico.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la consulta -->
+                <div class="alert alert-info mb-4">
+                    <h6><i class="bi bi-calendar-check me-2"></i>Información de la Consulta</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Fecha de Consulta:</strong> {{ receta.consulta.fecha|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Motivo:</strong> {{ receta.consulta.motivo }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Diagnóstico:</strong> {{ receta.consulta.diagnostico }}</p>
+                            <p><strong>Observaciones:</strong> {{ receta.consulta.observaciones|default:"Sin observaciones" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fechas de la receta -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="date-card text-center p-3 bg-light rounded">
+                            <i class="bi bi-calendar-plus text-primary fs-2 d-block mb-2"></i>
+                            <h6 class="mb-1">Fecha de Prescripción</h6>
+                            <p class="mb-0 fw-bold">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="date-card text-center p-3 bg-light rounded">
+                            <i class="bi bi-calendar-x text-warning fs-2 d-block mb-2"></i>
+                            <h6 class="mb-1">Fecha de Vencimiento</h6>
+                            <p class="mb-0 fw-bold">{{ receta.fecha_vencimiento|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="date-card text-center p-3 bg-light rounded">
+                            <i class="bi bi-clock text-info fs-2 d-block mb-2"></i>
+                            <h6 class="mb-1">Días Restantes</h6>
+                            <p class="mb-0 fw-bold">
+                                {% if receta.fecha_vencimiento >= today %}
+                                    {{ days_remaining }} días
+                                {% else %}
+                                    <span class="text-danger">Vencida</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medicamentos prescritos -->
+                <div class="mb-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-capsule me-2"></i>Medicamentos Prescritos
+                    </h6>
+                    
+                    {% for detalle in receta.detalles.all %}
+                    <div class="card mb-3 medicamento-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-start">
+                                        <div class="medicamento-icon me-3">
+                                            <div class="bg-secondary rounded-circle p-2">
+                                                <i class="bi bi-capsule text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div class="medicamento-info">
+                                            <h6 class="mb-1">{{ detalle.medicamento.nombre_comercial }}</h6>
+                                            <p class="text-muted mb-2">{{ detalle.medicamento.principio_activo }} - {{ detalle.medicamento.concentracion }}</p>
+                                            <div class="medicamento-details">
+                                                <span class="badge bg-light text-dark me-2">{{ detalle.medicamento.tipo }}</span>
+                                                <span class="badge bg-light text-dark me-2">{{ detalle.medicamento.laboratorio }}</span>
+                                                {% if detalle.medicamento.requiere_receta %}
+                                                    <span class="badge bg-warning">Requiere Receta</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="prescription-details">
+                                        <div class="detail-item mb-2">
+                                            <strong>Dosis:</strong> {{ detalle.dosis }}
+                                        </div>
+                                        <div class="detail-item mb-2">
+                                            <strong>Frecuencia:</strong> {{ detalle.frecuencia }}
+                                        </div>
+                                        {% if detalle.duracion %}
+                                        <div class="detail-item mb-2">
+                                            <strong>Duración:</strong> {{ detalle.duracion }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if detalle.instrucciones %}
+                            <div class="mt-3 pt-3 border-top">
+                                <strong>Instrucciones Especiales:</strong>
+                                <p class="mb-0 text-muted">{{ detalle.instrucciones }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-capsule fs-1 d-block mb-2"></i>
+                        <p>No hay medicamentos prescritos en esta receta</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Observaciones generales -->
+                {% if receta.observaciones %}
+                <div class="mb-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-chat-text me-2"></i>Observaciones Generales
+                    </h6>
+                    <div class="alert alert-light">
+                        <p class="mb-0">{{ receta.observaciones }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Acciones rápidas -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>Acciones Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'recetas_edit' receta.id %}" class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i>Editar Receta
+                    </a>
+                    <button type="button" class="btn btn-info" onclick="printReceta()">
+                        <i class="bi bi-printer me-2"></i>Imprimir Receta
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="sendEmail()">
+                        <i class="bi bi-envelope me-2"></i>Enviar por Email
+                    </button>
+                    <a href="{% url 'consultas_detail' receta.consulta.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-calendar-check me-2"></i>Ver Consulta
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estado de la receta -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Estado de la Receta
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="status-timeline">
+                    <div class="status-item {% if receta.fecha_prescripcion %}completed{% endif %}">
+                        <div class="status-icon bg-success">
+                            <i class="bi bi-check"></i>
+                        </div>
+                        <div class="status-content">
+                            <h6>Receta Creada</h6>
+                            <small class="text-muted">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="status-item {% if receta.fecha_vencimiento >= today %}active{% else %}expired{% endif %}">
+                        <div class="status-icon {% if receta.fecha_vencimiento >= today %}bg-primary{% else %}bg-danger{% endif %}">
+                            <i class="bi bi-{% if receta.fecha_vencimiento >= today %}clock{% else %}x{% endif %}"></i>
+                        </div>
+                        <div class="status-content">
+                            <h6>{% if receta.fecha_vencimiento >= today %}Vigente{% else %}Vencida{% endif %}</h6>
+                            <small class="text-muted">Hasta {{ receta.fecha_vencimiento|date:"d/m/Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Estadísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="stat-item mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Total Medicamentos:</span>
+                        <strong>{{ receta.detalles.count }}</strong>
+                    </div>
+                </div>
+                <div class="stat-item mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Con Receta Requerida:</span>
+                        <strong>{{ medicamentos_con_receta }}</strong>
+                    </div>
+                </div>
+                <div class="stat-item mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Días de Validez:</span>
+                        <strong>{{ total_validity_days }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial del paciente -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Historial del Paciente
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <p><strong>Recetas anteriores:</strong> {{ recetas_anteriores }}</p>
+                    <p><strong>Última consulta:</strong> {{ ultima_consulta|date:"d/m/Y" }}</p>
+                    <p><strong>Próxima cita:</strong> {{ proxima_cita|date:"d/m/Y"|default:"No programada" }}</p>
+                </div>
+                <a href="{% url 'pacientes_detail' receta.consulta.paciente.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-person me-1"></i>Ver Perfil Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para envío de email -->
+<div class="modal fade" id="emailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enviar Receta por Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="emailForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email del paciente</label>
+                        <input type="email" class="form-control" id="email" value="{{ receta.consulta.paciente.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Mensaje adicional (opcional)</label>
+                        <textarea class="form-control" id="mensaje" rows="3" placeholder="Mensaje personalizado para el paciente..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmSendEmail()">
+                    <i class="bi bi-envelope me-2"></i>Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-lg {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .info-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        height: 100%;
+    }
+    
+    .date-card {
+        transition: transform 0.2s ease;
+    }
+    
+    .date-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .medicamento-card {
+        border-left: 4px solid var(--secondary-color);
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .medicamento-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .medicamento-icon {
+        flex-shrink: 0;
+    }
+    
+    .prescription-details {
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 15px;
+    }
+    
+    .detail-item {
+        font-size: 0.9rem;
+    }
+    
+    .status-timeline {
+        position: relative;
+    }
+    
+    .status-item {
+        display: flex;
+        align-items-center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .status-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        width: 2px;
+        height: 20px;
+        background-color: #dee2e6;
+    }
+    
+    .status-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+        font-size: 16px;
+    }
+    
+    .status-content h6 {
+        margin-bottom: 2px;
+        font-size: 0.9rem;
+    }
+    
+    .stat-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    @media print {
+        .btn, .card-header, .sidebar, .page-actions {
+            display: none !important;
+        }
+        
+        .main-content {
+            margin-left: 0 !important;
+        }
+        
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .col-lg-4 {
+            display: none !important;
+        }
+        
+        .col-lg-8 {
+            width: 100% !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function printReceta() {
+        window.print();
+    }
+    
+    function sendEmail() {
+        const modal = new bootstrap.Modal(document.getElementById('emailModal'));
+        modal.show();
+    }
+    
+    function confirmSendEmail() {
+        const email = document.getElementById('email').value;
+        const mensaje = document.getElementById('mensaje').value;
+        
+        if (!email) {
+            alert('Por favor ingrese un email válido');
+            return;
+        }
+        
+        // Aquí iría la lógica para enviar el email
+        // Por ahora solo mostramos un mensaje de confirmación
+        alert('Receta enviada por email a: ' + email);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
+        modal.hide();
+    }
+    
+    // Actualizar estado de vencimiento en tiempo real
+    function updateExpirationStatus() {
+        const today = new Date();
+        const expirationDate = new Date('{{ receta.fecha_vencimiento|date:"Y-m-d" }}');
+        
+        if (expirationDate < today) {
+            // Actualizar badges y estados si la receta ha vencido
+            const badges = document.querySelectorAll('.badge');
+            badges.forEach(badge => {
+                if (badge.textContent.includes('Vigente')) {
+                    badge.className = 'badge bg-danger fs-6';
+                    badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Vencida';
+                }
+            });
+        }
+    }
+    
+    // Verificar estado cada minuto
+    setInterval(updateExpirationStatus, 60000);
+</script>
+{% endblock %}

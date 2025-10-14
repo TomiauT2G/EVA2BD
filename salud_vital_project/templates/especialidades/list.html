@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Especialidades - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Especialidades{% endblock %}
+{% block page_description %}Gestión de especialidades médicas{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'especialidades_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i>
+    Nueva Especialidad
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bookmark-star me-2"></i>
+                    Lista de Especialidades
+                </h5>
+            </div>
+            <div class="col-auto">
+                <form method="GET" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Buscar especialidad..." value="{{ request.GET.search }}">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    {% if request.GET.search %}
+                        <a href="{% url 'especialidades_list' %}" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body">
+        {% if especialidades %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Médicos</th>
+                            <th>Consultas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for especialidad in especialidades %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">#{{ especialidad.id }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ especialidad.nombre }}</strong>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ especialidad.descripcion|truncatechars:50 }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ especialidad.medicos.count }} médico{{ especialidad.medicos.count|pluralize }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">{{ especialidad.total_consultas|default:0 }} consulta{{ especialidad.total_consultas|default:0|pluralize }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'especialidades_detail' especialidad.pk %}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'especialidades_edit' especialidad.pk %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar" 
+                                                onclick="deleteEspecialidad({{ especialidad.pk }}, '{{ especialidad.nombre }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="Paginación de especialidades">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-bookmark-x display-1 text-muted mb-3"></i>
+                <h4 class="text-muted">No hay especialidades registradas</h4>
+                <p class="text-muted">Comience agregando la primera especialidad médica</p>
+                <a href="{% url 'especialidades_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Crear Primera Especialidad
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar la especialidad <strong id="especialidadName"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Esta acción no se puede deshacer. Todos los médicos asociados a esta especialidad quedarán sin especialidad asignada.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteEspecialidad(id, nombre) {
+    document.getElementById('especialidadName').textContent = nombre;
+    document.getElementById('deleteForm').action = "{% url 'especialidades_delete' 0 %}".replace('0', id);
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+// Auto-submit search form on input
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let timeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    }
+});
+</script>
+{% endblock %}

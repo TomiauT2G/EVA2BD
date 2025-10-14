@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ especialidad.nombre }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}{{ especialidad.nombre }}{% endblock %}
+{% block page_description %}Detalles de la especialidad médica{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    <a href="{% url 'especialidades_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Volver a Lista
+    </a>
+    <a href="{% url 'especialidades_edit' especialidad.pk %}" class="btn btn-warning">
+        <i class="bi bi-pencil me-2"></i>
+        Editar
+    </a>
+    <button type="button" class="btn btn-danger" onclick="deleteEspecialidad({{ especialidad.pk }}, '{{ especialidad.nombre }}')">
+        <i class="bi bi-trash me-2"></i>
+        Eliminar
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Information -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bookmark-star me-2"></i>
+                    Información General
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-bookmark-star display-1 text-primary"></i>
+                            <h4 class="mt-2">{{ especialidad.nombre }}</h4>
+                            <span class="badge bg-primary">ID: #{{ especialidad.id }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-bold text-muted" style="width: 30%;">
+                                    <i class="bi bi-bookmark me-2"></i>
+                                    Nombre:
+                                </td>
+                                <td>{{ especialidad.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-text-paragraph me-2"></i>
+                                    Descripción:
+                                </td>
+                                <td>
+                                    {% if especialidad.descripcion %}
+                                        {{ especialidad.descripcion }}
+                                    {% else %}
+                                        <span class="text-muted">Sin descripción</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-calendar-plus me-2"></i>
+                                    Fecha de Creación:
+                                </td>
+                                <td>{{ especialidad.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-muted">
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    Última Actualización:
+                                </td>
+                                <td>{{ especialidad.updated_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Associated Doctors -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-people me-2"></i>
+                    Médicos Asociados ({{ especialidad.medicos.count }})
+                </h5>
+                <a href="{% url 'medicos_create' %}?especialidad={{ especialidad.pk }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>
+                    Agregar Médico
+                </a>
+            </div>
+            <div class="card-body">
+                {% if especialidad.medicos.exists %}
+                    <div class="row">
+                        {% for medico in especialidad.medicos.all %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="bi bi-person-badge display-6 text-primary"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Dr. {{ medico.nombre }} {{ medico.apellido }}</h6>
+                                                <p class="text-muted mb-1 small">{{ medico.email }}</p>
+                                                <p class="text-muted mb-0 small">{{ medico.telefono }}</p>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'medicos_detail' medico.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if especialidad.medicos.count > 6 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'medicos_list' %}?especialidad={{ especialidad.pk }}" class="btn btn-outline-primary">
+                                Ver todos los médicos de {{ especialidad.nombre }}
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-person-x display-4 text-muted mb-3"></i>
+                        <h6 class="text-muted">No hay médicos asociados a esta especialidad</h6>
+                        <p class="text-muted">Agregue el primer médico para esta especialidad</p>
+                        <a href="{% url 'medicos_create' %}?especialidad={{ especialidad.pk }}" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Agregar Primer Médico
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Sidebar -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Estadísticas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="bi bi-people display-4 text-primary mb-2"></i>
+                            <h4 class="mb-0">{{ especialidad.medicos.count }}</h4>
+                            <small class="text-muted">Médico{{ especialidad.medicos.count|pluralize }}</small>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="bi bi-calendar-check display-4 text-success mb-2"></i>
+                            <h4 class="mb-0">{{ total_consultas|default:0 }}</h4>
+                            <small class="text-muted">Consulta{{ total_consultas|default:0|pluralize }}</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small text-muted">Actividad</span>
+                        <span class="badge bg-success">Activa</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small text-muted">Popularidad</span>
+                        <span class="small">{{ especialidad.medicos.count }}/10</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar" style="width: {{ especialidad.medicos.count|mul:10 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'medicos_create' %}?especialidad={{ especialidad.pk }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Agregar Médico
+                    </a>
+                    <a href="{% url 'consultas_list' %}?especialidad={{ especialidad.pk }}" class="btn btn-outline-success">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Ver Consultas
+                    </a>
+                    <a href="{% url 'especialidades_edit' especialidad.pk %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil me-2"></i>
+                        Editar Especialidad
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <i class="bi bi-bookmark-star text-primary"></i>
+                        <div class="timeline-content">
+                            <small class="text-muted">{{ especialidad.created_at|date:"d/m/Y" }}</small>
+                            <p class="mb-0">Especialidad creada</p>
+                        </div>
+                    </div>
+                    {% if especialidad.updated_at != especialidad.created_at %}
+                        <div class="timeline-item">
+                            <i class="bi bi-pencil text-warning"></i>
+                            <div class="timeline-content">
+                                <small class="text-muted">{{ especialidad.updated_at|date:"d/m/Y" }}</small>
+                                <p class="mb-0">Última actualización</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar la especialidad <strong>{{ especialidad.nombre }}</strong>?</p>
+                {% if especialidad.medicos.count > 0 %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>¡Atención!</strong> Esta especialidad tiene {{ especialidad.medicos.count }} médico{{ especialidad.medicos.count|pluralize }} asociado{{ especialidad.medicos.count|pluralize }}. 
+                        Al eliminarla, estos médicos quedarán sin especialidad asignada.
+                    </div>
+                {% endif %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Esta acción no se puede deshacer.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST" action="{% url 'especialidades_delete' especialidad.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Definitivamente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-item i {
+        position: absolute;
+        left: -30px;
+        top: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .progress {
+        border-radius: 10px;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteEspecialidad(id, nombre) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

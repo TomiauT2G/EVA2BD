@@ -1,0 +1,503 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Receta Médica - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Editar Receta Médica{% endblock %}
+{% block page_description %}Modificar prescripción médica existente{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    <a href="{% url 'recetas_detail' receta.id %}" class="btn btn-outline-info">
+        <i class="bi bi-eye me-2"></i>Ver Detalles
+    </a>
+    <a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-prescription2 me-2"></i>
+                        Editar Receta Médica
+                    </h5>
+                    <div class="badge bg-{{ receta.fecha_vencimiento >= today|date:'Y-m-d' and 'success' or 'danger' }}">
+                        {{ receta.fecha_vencimiento >= today|date:'Y-m-d' and 'Vigente' or 'Vencida' }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Información básica -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="consulta" class="form-label">Consulta Médica *</label>
+                            <select class="form-select" id="consulta" name="consulta" required>
+                                <option value="">Seleccionar consulta...</option>
+                                {% for consulta in consultas %}
+                                    <option value="{{ consulta.id }}" 
+                                            {% if consulta.id == receta.consulta.id %}selected{% endif %}
+                                            data-paciente="{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}"
+                                            data-medico="Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}"
+                                            data-fecha="{{ consulta.fecha|date:'d/m/Y' }}"
+                                            data-diagnostico="{{ consulta.diagnostico }}">
+                                        {{ consulta.fecha|date:"d/m/Y" }} - {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }} (Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione una consulta médica.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento *</label>
+                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" 
+                                   value="{{ receta.fecha_vencimiento|date:'Y-m-d' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese la fecha de vencimiento.
+                            </div>
+                            {% if receta.fecha_vencimiento < today %}
+                                <small class="form-text text-danger">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Esta receta está vencida
+                                </small>
+                            {% elif receta.fecha_vencimiento <= warning_date %}
+                                <small class="form-text text-warning">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Esta receta vence pronto
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Información de la consulta -->
+                    <div class="alert alert-info mb-4">
+                        <h6><i class="bi bi-info-circle me-2"></i>Información de la Consulta</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}<br>
+                                <strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}<br>
+                                <strong>Diagnóstico:</strong> {{ receta.consulta.diagnostico }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medicamentos existentes -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Medicamentos Prescritos</h6>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMedicamento()">
+                                <i class="bi bi-plus-circle me-1"></i>Agregar Medicamento
+                            </button>
+                        </div>
+                        
+                        <div id="medicamentos-container">
+                            {% for detalle in receta.detalles.all %}
+                            <div class="card mb-3 medicamento-item">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h6 class="card-title mb-0">Medicamento <span class="medicamento-number">{{ forloop.counter }}</span></h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Medicamento *</label>
+                                            <select class="form-select medicamento-select" name="medicamento[]" required>
+                                                <option value="">Seleccionar medicamento...</option>
+                                                {% for medicamento in medicamentos %}
+                                                    <option value="{{ medicamento.id }}" 
+                                                            {% if medicamento.id == detalle.medicamento.id %}selected{% endif %}
+                                                            data-nombre="{{ medicamento.nombre_comercial }}"
+                                                            data-principio="{{ medicamento.principio_activo }}"
+                                                            data-concentracion="{{ medicamento.concentracion }}"
+                                                            data-tipo="{{ medicamento.tipo }}">
+                                                        {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Dosis *</label>
+                                            <input type="text" class="form-control" name="dosis[]" 
+                                                   value="{{ detalle.dosis }}" placeholder="ej: 500mg, 1 comprimido" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Frecuencia *</label>
+                                            <select class="form-select" name="frecuencia[]" required>
+                                                <option value="">Seleccionar frecuencia...</option>
+                                                <option value="Cada 4 horas" {% if detalle.frecuencia == "Cada 4 horas" %}selected{% endif %}>Cada 4 horas</option>
+                                                <option value="Cada 6 horas" {% if detalle.frecuencia == "Cada 6 horas" %}selected{% endif %}>Cada 6 horas</option>
+                                                <option value="Cada 8 horas" {% if detalle.frecuencia == "Cada 8 horas" %}selected{% endif %}>Cada 8 horas</option>
+                                                <option value="Cada 12 horas" {% if detalle.frecuencia == "Cada 12 horas" %}selected{% endif %}>Cada 12 horas</option>
+                                                <option value="Una vez al día" {% if detalle.frecuencia == "Una vez al día" %}selected{% endif %}>Una vez al día</option>
+                                                <option value="Dos veces al día" {% if detalle.frecuencia == "Dos veces al día" %}selected{% endif %}>Dos veces al día</option>
+                                                <option value="Tres veces al día" {% if detalle.frecuencia == "Tres veces al día" %}selected{% endif %}>Tres veces al día</option>
+                                                <option value="Según necesidad" {% if detalle.frecuencia == "Según necesidad" %}selected{% endif %}>Según necesidad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Duración</label>
+                                            <input type="text" class="form-control" name="duracion[]" 
+                                                   value="{{ detalle.duracion }}" placeholder="ej: 7 días, 2 semanas">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Instrucciones Especiales</label>
+                                            <textarea class="form-control" name="instrucciones[]" rows="2" 
+                                                      placeholder="Tomar con alimentos, antes de dormir, etc.">{{ detalle.instrucciones }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if not receta.detalles.all %}
+                        <div class="text-muted text-center py-3" id="no-medicamentos">
+                            <i class="bi bi-capsule fs-1 d-block mb-2"></i>
+                            <p>No hay medicamentos agregados</p>
+                            <button type="button" class="btn btn-primary" onclick="addMedicamento()">
+                                <i class="bi bi-plus-circle me-2"></i>Agregar primer medicamento
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="text-muted text-center py-3 d-none" id="no-medicamentos">
+                            <i class="bi bi-capsule fs-1 d-block mb-2"></i>
+                            <p>No hay medicamentos agregados</p>
+                            <button type="button" class="btn btn-primary" onclick="addMedicamento()">
+                                <i class="bi bi-plus-circle me-2"></i>Agregar primer medicamento
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-4">
+                        <label for="observaciones" class="form-label">Observaciones Generales</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" 
+                                  placeholder="Instrucciones generales, precauciones especiales, etc.">{{ receta.observaciones }}</textarea>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'recetas_detail' receta.id %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Historial de cambios -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Historial de Cambios
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Receta creada</h6>
+                            <p class="text-muted mb-0">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    {% if receta.fecha_modificacion %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Última modificación</h6>
+                            <p class="text-muted mb-0">{{ receta.fecha_modificacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista previa de la receta -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-eye me-2"></i>Vista Previa
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="preview-content">
+                    <!-- Se actualizará dinámicamente -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ayuda -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-question-circle me-2"></i>Ayuda
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <p><strong>Consejos para editar:</strong></p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check text-success me-2"></i>Verifique las dosis y frecuencias</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Actualice la fecha de vencimiento si es necesario</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Agregue observaciones importantes</li>
+                        <li><i class="bi bi-exclamation-triangle text-warning me-2"></i>Los cambios afectarán la prescripción actual</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para medicamento -->
+<template id="medicamento-template">
+    <div class="card mb-3 medicamento-item">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h6 class="card-title mb-0">Medicamento <span class="medicamento-number"></span></h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Medicamento *</label>
+                    <select class="form-select medicamento-select" name="medicamento[]" required>
+                        <option value="">Seleccionar medicamento...</option>
+                        {% for medicamento in medicamentos %}
+                            <option value="{{ medicamento.id }}" 
+                                    data-nombre="{{ medicamento.nombre_comercial }}"
+                                    data-principio="{{ medicamento.principio_activo }}"
+                                    data-concentracion="{{ medicamento.concentracion }}"
+                                    data-tipo="{{ medicamento.tipo }}">
+                                {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Dosis *</label>
+                    <input type="text" class="form-control" name="dosis[]" 
+                           placeholder="ej: 500mg, 1 comprimido" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Frecuencia *</label>
+                    <select class="form-select" name="frecuencia[]" required>
+                        <option value="">Seleccionar frecuencia...</option>
+                        <option value="Cada 4 horas">Cada 4 horas</option>
+                        <option value="Cada 6 horas">Cada 6 horas</option>
+                        <option value="Cada 8 horas">Cada 8 horas</option>
+                        <option value="Cada 12 horas">Cada 12 horas</option>
+                        <option value="Una vez al día">Una vez al día</option>
+                        <option value="Dos veces al día">Dos veces al día</option>
+                        <option value="Tres veces al día">Tres veces al día</option>
+                        <option value="Según necesidad">Según necesidad</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Duración</label>
+                    <input type="text" class="form-control" name="duracion[]" 
+                           placeholder="ej: 7 días, 2 semanas">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Instrucciones Especiales</label>
+                    <textarea class="form-control" name="instrucciones[]" rows="2" 
+                              placeholder="Tomar con alimentos, antes de dormir, etc."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .medicamento-item {
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -23px;
+        top: 5px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+    
+    .timeline-content {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border-left: 3px solid var(--primary-color);
+    }
+    
+    .preview-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .preview-header {
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .medicamento-preview {
+        background-color: white;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--secondary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let medicamentoCounter = {{ receta.detalles.count }};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePreview();
+        
+        // Event listeners para actualizar vista previa
+        document.getElementById('fecha_vencimiento').addEventListener('change', updatePreview);
+        document.getElementById('observaciones').addEventListener('input', updatePreview);
+        
+        // Event listeners para medicamentos existentes
+        const existingInputs = document.querySelectorAll('#medicamentos-container select, #medicamentos-container input, #medicamentos-container textarea');
+        existingInputs.forEach(element => {
+            element.addEventListener('change', updatePreview);
+            element.addEventListener('input', updatePreview);
+        });
+    });
+    
+    function addMedicamento() {
+        medicamentoCounter++;
+        const template = document.getElementById('medicamento-template');
+        const clone = template.content.cloneNode(true);
+        
+        // Actualizar número del medicamento
+        clone.querySelector('.medicamento-number').textContent = medicamentoCounter;
+        
+        // Agregar event listeners
+        const selects = clone.querySelectorAll('select, input, textarea');
+        selects.forEach(element => {
+            element.addEventListener('change', updatePreview);
+            element.addEventListener('input', updatePreview);
+        });
+        
+        document.getElementById('medicamentos-container').appendChild(clone);
+        document.getElementById('no-medicamentos').classList.add('d-none');
+        updatePreview();
+    }
+    
+    function removeMedicamento(button) {
+        button.closest('.medicamento-item').remove();
+        
+        // Renumerar medicamentos
+        const items = document.querySelectorAll('.medicamento-item');
+        items.forEach((item, index) => {
+            item.querySelector('.medicamento-number').textContent = index + 1;
+        });
+        
+        if (items.length === 0) {
+            document.getElementById('no-medicamentos').classList.remove('d-none');
+            medicamentoCounter = 0;
+        }
+        
+        updatePreview();
+    }
+    
+    function updatePreview() {
+        const fechaVencimiento = document.getElementById('fecha_vencimiento');
+        const observaciones = document.getElementById('observaciones');
+        const previewContent = document.getElementById('preview-content');
+        
+        const medicamentos = document.querySelectorAll('.medicamento-item');
+        
+        let medicamentosHtml = '';
+        medicamentos.forEach((item, index) => {
+            const medicamentoSelect = item.querySelector('.medicamento-select');
+            const dosis = item.querySelector('input[name="dosis[]"]').value;
+            const frecuencia = item.querySelector('select[name="frecuencia[]"]').value;
+            const duracion = item.querySelector('input[name="duracion[]"]').value;
+            const instrucciones = item.querySelector('textarea[name="instrucciones[]"]').value;
+            
+            if (medicamentoSelect.value) {
+                const medicamentoOption = medicamentoSelect.options[medicamentoSelect.selectedIndex];
+                medicamentosHtml += `
+                    <div class="medicamento-preview">
+                        <strong>${medicamentoOption.dataset.nombre}</strong>
+                        <br><small class="text-muted">${medicamentoOption.dataset.principio} - ${medicamentoOption.dataset.concentracion}</small>
+                        ${dosis ? `<br><strong>Dosis:</strong> ${dosis}` : ''}
+                        ${frecuencia ? `<br><strong>Frecuencia:</strong> ${frecuencia}` : ''}
+                        ${duracion ? `<br><strong>Duración:</strong> ${duracion}` : ''}
+                        ${instrucciones ? `<br><strong>Instrucciones:</strong> ${instrucciones}` : ''}
+                    </div>
+                `;
+            }
+        });
+        
+        previewContent.innerHTML = `
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h6 class="mb-0">RECETA MÉDICA</h6>
+                </div>
+                <p><strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</p>
+                <p><strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</p>
+                <p><strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}</p>
+                <p><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
+                
+                <h6 class="mt-3 mb-2">Medicamentos:</h6>
+                ${medicamentosHtml || '<p class="text-muted">No hay medicamentos agregados</p>'}
+                
+                ${observaciones.value ? `<h6 class="mt-3 mb-2">Observaciones:</h6><p>${observaciones.value}</p>` : ''}
+            </div>
+        `;
+    }
+</script>
+{% endblock %}

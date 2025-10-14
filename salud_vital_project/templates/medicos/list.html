@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Médicos - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Médicos{% endblock %}
+{% block page_description %}Gestión de médicos del sistema{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'medicos_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i>
+    Nuevo Médico
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-badge me-2"></i>
+                    Lista de Médicos
+                </h5>
+            </div>
+            <div class="col-md-6">
+                <form method="GET" class="d-flex gap-2">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search }}" 
+                           class="form-control" 
+                           placeholder="Buscar por nombre, apellido, licencia...">
+                    <select name="especialidad" class="form-select" style="max-width: 200px;">
+                        <option value="">Todas las especialidades</option>
+                        {% for esp in especialidades %}
+                            <option value="{{ esp.id }}" {% if especialidad == esp.id|stringformat:"s" %}selected{% endif %}>
+                                {{ esp.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    {% if search or especialidad %}
+                        <a href="{% url 'medicos_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Médico</th>
+                            <th>Especialidad</th>
+                            <th>Licencia</th>
+                            <th>Contacto</th>
+                            <th>Consultas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for medico in page_obj %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-3">
+                                            {{ medico.nombre.0 }}{{ medico.apellido.0 }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Dr. {{ medico.nombre }} {{ medico.apellido }}</div>
+                                            <small class="text-muted">{{ medico.get_tipo_documento_display }} {{ medico.numero_documento }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ medico.especialidad.nombre }}</span>
+                                </td>
+                                <td>
+                                    <span class="font-monospace">{{ medico.numero_licencia }}</span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <i class="bi bi-envelope me-1"></i>
+                                        <a href="mailto:{{ medico.email }}" class="text-decoration-none">
+                                            {{ medico.email }}
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-telephone me-1"></i>
+                                        <a href="tel:{{ medico.telefono }}" class="text-decoration-none">
+                                            {{ medico.telefono }}
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ medico.consultamedica_set.count }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'medicos_detail' medico.pk %}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'medicos_edit' medico.pk %}" 
+                                           class="btn btn-outline-warning" 
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'consultas_create' %}?medico={{ medico.pk }}" 
+                                           class="btn btn-outline-success" 
+                                           title="Nueva consulta">
+                                            <i class="bi bi-plus"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-outline-danger" 
+                                                title="Eliminar"
+                                                onclick="confirmDelete('{{ medico.pk }}', 'Dr. {{ medico.nombre }} {{ medico.apellido }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Paginación de médicos">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}">Anterior</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-person-badge display-1 text-muted"></i>
+                <h5 class="text-muted mt-3">No se encontraron médicos</h5>
+                {% if search or especialidad %}
+                    <p class="text-muted">Intenta ajustar los filtros de búsqueda.</p>
+                    <a href="{% url 'medicos_list' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+                        Limpiar filtros
+                    </a>
+                {% else %}
+                    <p class="text-muted">Comienza agregando el primer médico al sistema.</p>
+                    <a href="{% url 'medicos_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Agregar Primer Médico
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar al médico <strong id="medicoName"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción eliminará también todas las consultas asociadas a este médico.
+                </div>
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" id="deleteForm" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Médico
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDelete(medicoId, medicoName) {
+        document.getElementById('medicoName').textContent = medicoName;
+        document.getElementById('deleteForm').action = `/medicos/${medicoId}/eliminar/`;
+        
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

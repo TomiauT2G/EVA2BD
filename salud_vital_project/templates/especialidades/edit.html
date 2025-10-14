@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Especialidad - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Editar Especialidad{% endblock %}
+{% block page_description %}Modificar información de la especialidad: {{ especialidad.nombre }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    <a href="{% url 'especialidades_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Volver a Lista
+    </a>
+    <a href="{% url 'especialidades_detail' especialidad.pk %}" class="btn btn-outline-info">
+        <i class="bi bi-eye me-2"></i>
+        Ver Detalles
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pencil me-2"></i>
+                    Editar Especialidad: {{ especialidad.nombre }}
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="bi bi-bookmark-star me-1"></i>
+                                Nombre de la Especialidad *
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nombre.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Ingrese el nombre completo de la especialidad médica
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <i class="bi bi-text-paragraph me-1"></i>
+                                Descripción
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.descripcion.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Descripción detallada de la especialidad y su área de enfoque
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Changes Preview -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-eye me-2"></i>
+                                Vista Previa de Cambios
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Antes:</h6>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="bi bi-bookmark text-muted display-6"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">{{ especialidad.nombre }}</h6>
+                                            <p class="text-muted mb-0 small">{{ especialidad.descripcion|truncatechars:50 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">Después:</h6>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="bi bi-bookmark-star text-primary display-6"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1" id="preview-nombre">{{ especialidad.nombre }}</h6>
+                                            <p class="text-muted mb-0 small" id="preview-descripcion">{{ especialidad.descripcion|truncatechars:50 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Associated Data Warning -->
+                    {% if especialidad.medicos.count > 0 %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Información:</strong> Esta especialidad tiene {{ especialidad.medicos.count }} médico{{ especialidad.medicos.count|pluralize }} asociado{{ especialidad.medicos.count|pluralize }}. 
+                            Los cambios se aplicarán a todos los registros relacionados.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Associated Records -->
+        {% if especialidad.medicos.count > 0 %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        Médicos Asociados ({{ especialidad.medicos.count }})
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for medico in especialidad.medicos.all|slice:":6" %}
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-badge me-2 text-primary"></i>
+                                    <span>Dr. {{ medico.nombre }} {{ medico.apellido }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if especialidad.medicos.count > 6 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'medicos_list' %}?especialidad={{ especialidad.pk }}" class="btn btn-outline-primary btn-sm">
+                                Ver todos los médicos
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    Consejos de Edición
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Asegúrese de que el nombre siga siendo único en el sistema</li>
+                    <li>Los cambios se reflejarán en todos los registros asociados</li>
+                    <li>Use nombres estándar reconocidos en medicina</li>
+                    <li>La descripción debe ser clara y específica</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+    
+    .invalid-feedback {
+        display: block !important;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nombreInput = document.getElementById('{{ form.nombre.id_for_label }}');
+    const descripcionInput = document.getElementById('{{ form.descripcion.id_for_label }}');
+    const previewNombre = document.getElementById('preview-nombre');
+    const previewDescripcion = document.getElementById('preview-descripcion');
+    
+    // Update preview in real-time
+    function updatePreview() {
+        const nombre = nombreInput.value.trim() || '{{ especialidad.nombre }}';
+        const descripcion = descripcionInput.value.trim() || '{{ especialidad.descripcion }}';
+        
+        previewNombre.textContent = nombre;
+        previewDescripcion.textContent = descripcion.length > 50 ? descripcion.substring(0, 47) + '...' : descripcion;
+    }
+    
+    nombreInput.addEventListener('input', updatePreview);
+    descripcionInput.addEventListener('input', updatePreview);
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Add required attribute and validation
+    nombreInput.setAttribute('required', 'required');
+    nombreInput.setAttribute('minlength', '2');
+    nombreInput.setAttribute('maxlength', '100');
+    
+    descripcionInput.setAttribute('maxlength', '500');
+});
+</script>
+{% endblock %}

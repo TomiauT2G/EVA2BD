@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}Recetas Médicas - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Recetas Médicas{% endblock %}
+{% block page_description %}Gestión de prescripciones médicas{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'recetas_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i>Nueva Receta
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-prescription2 me-2"></i>
+                    Lista de Recetas Médicas
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Filtros y búsqueda -->
+                <form method="GET" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ request.GET.search }}" 
+                                   placeholder="Buscar por paciente, médico o medicamento...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="medico" class="form-label">Médico</label>
+                            <select class="form-select" id="medico" name="medico">
+                                <option value="">Todos los médicos</option>
+                                {% for medico in medicos %}
+                                    <option value="{{ medico.id }}" 
+                                            {% if request.GET.medico == medico.id|stringformat:"s" %}selected{% endif %}>
+                                        Dr. {{ medico.nombre }} {{ medico.apellido }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fecha_desde" class="form-label">Fecha desde</label>
+                            <input type="date" class="form-control" id="fecha_desde" name="fecha_desde" 
+                                   value="{{ request.GET.fecha_desde }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="bi bi-search me-1"></i>Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Estadísticas rápidas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h4 class="mb-0">{{ total_recetas }}</h4>
+                                <small>Total Recetas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h4 class="mb-0">{{ recetas_activas }}</h4>
+                                <small>Activas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h4 class="mb-0">{{ recetas_vencidas }}</h4>
+                                <small>Vencidas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h4 class="mb-0">{{ recetas_hoy }}</h4>
+                                <small>Hoy</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de recetas -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Paciente</th>
+                                <th>Médico</th>
+                                <th>Medicamentos</th>
+                                <th>Estado</th>
+                                <th>Válida hasta</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for receta in recetas %}
+                            <tr>
+                                <td>
+                                    <strong>{{ receta.fecha_prescripcion|date:"d/m/Y" }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ receta.fecha_prescripcion|date:"H:i" }}</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-2">
+                                            <i class="bi bi-person text-white"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ receta.consulta.paciente.rut }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-success rounded-circle d-flex align-items-center justify-content-center me-2">
+                                            <i class="bi bi-person-badge text-white"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ receta.consulta.medico.especialidad.nombre }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="medicamentos-list">
+                                        {% for detalle in receta.detalles.all|slice:":2" %}
+                                            <span class="badge bg-light text-dark me-1 mb-1">
+                                                <i class="bi bi-capsule me-1"></i>
+                                                {{ detalle.medicamento.nombre_comercial }}
+                                            </span>
+                                        {% endfor %}
+                                        {% if receta.detalles.count > 2 %}
+                                            <span class="badge bg-secondary">+{{ receta.detalles.count|add:"-2" }} más</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if receta.fecha_vencimiento >= today %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Vigente
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle me-1"></i>Vencida
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ receta.fecha_vencimiento|date:"d/m/Y" }}</strong>
+                                    {% if receta.fecha_vencimiento < today %}
+                                        <br><small class="text-danger">Vencida</small>
+                                    {% elif receta.fecha_vencimiento <= warning_date %}
+                                        <br><small class="text-warning">Por vencer</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'recetas_detail' receta.id %}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'recetas_edit' receta.id %}" 
+                                           class="btn btn-sm btn-outline-warning" 
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                onclick="deleteReceta({{ receta.id }})" 
+                                                title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="bi bi-prescription2 fs-1 d-block mb-2"></i>
+                                        <p>No se encontraron recetas médicas</p>
+                                        <a href="{% url 'recetas_create' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle me-2"></i>Crear primera receta
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                {% if is_paginated %}
+                <nav aria-label="Paginación de recetas">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.medico %}&medico={{ request.GET.medico }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.medico %}&medico={{ request.GET.medico }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.medico %}&medico={{ request.GET.medico }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.medico %}&medico={{ request.GET.medico }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar esta receta médica?</p>
+                <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .medicamentos-list {
+        max-width: 200px;
+    }
+    
+    .card.bg-primary,
+    .card.bg-success,
+    .card.bg-warning,
+    .card.bg-info {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-group .btn {
+        border-radius: 4px;
+        margin-right: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function deleteReceta(recetaId) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        const form = document.getElementById('deleteForm');
+        form.action = `/recetas/${recetaId}/delete/`;
+        modal.show();
+    }
+    
+    // Auto-refresh para mostrar estado actualizado
+    setInterval(function() {
+        // Actualizar badges de estado cada 5 minutos
+        const badges = document.querySelectorAll('.badge');
+        badges.forEach(function(badge) {
+            if (badge.textContent.includes('Por vencer')) {
+                badge.classList.remove('bg-warning');
+                badge.classList.add('bg-danger');
+                badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Vencida';
+            }
+        });
+    }, 300000); // 5 minutos
+</script>
+{% endblock %}

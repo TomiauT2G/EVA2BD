@@ -1,0 +1,522 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tratamiento.nombre }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Detalles del Tratamiento{% endblock %}
+{% block page_description %}{{ tratamiento.nombre }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'tratamientos_edit' tratamiento.id %}" class="btn btn-warning me-2">
+    <i class="bi bi-pencil-square me-2"></i>
+    Editar
+</a>
+<a href="{% url 'tratamientos_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Treatment Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-heart-pulse me-2"></i>
+                    Información del Tratamiento
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Nombre del Tratamiento</label>
+                        <p class="fw-bold">{{ tratamiento.nombre }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Duración</label>
+                        <p class="fw-bold">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ tratamiento.duracion_dias }} días
+                        </p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label text-muted">Descripción</label>
+                        <p>{{ tratamiento.descripcion|default:"Sin descripción disponible" }}</p>
+                    </div>
+                    {% if tratamiento.instrucciones %}
+                    <div class="col-12 mb-3">
+                        <label class="form-label text-muted">Instrucciones Especiales</label>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            {{ tratamiento.instrucciones }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Consultation Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clipboard-data me-2"></i>
+                    Consulta Médica Asociada
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Paciente</label>
+                        <p class="fw-bold">
+                            <i class="bi bi-person me-1"></i>
+                            {{ tratamiento.consulta.paciente.nombre }} {{ tratamiento.consulta.paciente.apellido }}
+                        </p>
+                        <small class="text-muted">RUT: {{ tratamiento.consulta.paciente.rut }}</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Médico</label>
+                        <p class="fw-bold">
+                            <i class="bi bi-person-badge me-1"></i>
+                            Dr. {{ tratamiento.consulta.medico.nombre }} {{ tratamiento.consulta.medico.apellido }}
+                        </p>
+                        <small class="text-muted">{{ tratamiento.consulta.medico.especialidad.nombre }}</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Fecha de Consulta</label>
+                        <p class="fw-bold">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ tratamiento.consulta.fecha_hora|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Diagnóstico</label>
+                        <p class="fw-bold">{{ tratamiento.consulta.diagnostico|default:"Sin diagnóstico registrado" }}</p>
+                    </div>
+                    <div class="col-12">
+                        <a href="{% url 'consultas_detail' tratamiento.consulta.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-2"></i>
+                            Ver Consulta Completa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Cronología del Tratamiento
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Tratamiento Creado</h6>
+                            <p class="timeline-text">{{ tratamiento.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if tratamiento.fecha_inicio %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Inicio del Tratamiento</h6>
+                            <p class="timeline-text">{{ tratamiento.fecha_inicio|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if tratamiento.fecha_actualizacion != tratamiento.fecha_creacion %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">Última Actualización</h6>
+                            <p class="timeline-text">{{ tratamiento.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Medications -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-capsule me-2"></i>
+                    Medicamentos Relacionados
+                </h5>
+                <button class="btn btn-primary btn-sm" onclick="addMedication()">
+                    <i class="bi bi-plus me-2"></i>
+                    Agregar Medicamento
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="medications-list">
+                    <!-- This would be populated with related medications -->
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-capsule fs-1 mb-3 d-block"></i>
+                        <p>No hay medicamentos asociados a este tratamiento</p>
+                        <button class="btn btn-outline-primary" onclick="addMedication()">
+                            <i class="bi bi-plus me-2"></i>
+                            Agregar Primer Medicamento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Progress Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Progreso del Tratamiento
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="progress-info">
+                    <!-- Progress will be calculated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Estado del Tratamiento
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="status-indicator me-3" id="status-indicator"></div>
+                    <div>
+                        <div class="fw-bold" id="status-text"></div>
+                        <small class="text-muted" id="status-description"></small>
+                    </div>
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border rounded p-2">
+                            <div class="text-primary fw-bold">
+                                {% if tratamiento.fecha_inicio %}
+                                    {{ tratamiento.fecha_inicio|date:"d/m/Y" }}
+                                {% else %}
+                                    Sin definir
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">Fecha Inicio</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-2">
+                            <div class="text-success fw-bold" id="end-date">
+                                <!-- Calculated by JavaScript -->
+                            </div>
+                            <small class="text-muted">Fecha Fin</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>
+                    Acciones Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'tratamientos_edit' tratamiento.id %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar Tratamiento
+                    </a>
+                    <button class="btn btn-outline-primary btn-sm" onclick="addMedication()">
+                        <i class="bi bi-capsule me-2"></i>
+                        Agregar Medicamento
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="printTreatment()">
+                        <i class="bi bi-printer me-2"></i>
+                        Imprimir Tratamiento
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="duplicateTreatment()">
+                        <i class="bi bi-files me-2"></i>
+                        Duplicar Tratamiento
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Patient History -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Historial del Paciente
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="bi bi-person-circle fs-1 text-muted mb-2 d-block"></i>
+                    <p class="fw-bold">{{ tratamiento.consulta.paciente.nombre }} {{ tratamiento.consulta.paciente.apellido }}</p>
+                    <small class="text-muted">RUT: {{ tratamiento.consulta.paciente.rut }}</small>
+                </div>
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'pacientes_detail' tratamiento.consulta.paciente.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-person me-2"></i>
+                        Ver Perfil Completo
+                    </a>
+                    <button class="btn btn-outline-info btn-sm" onclick="viewPatientHistory()">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Ver Historial Médico
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar este tratamiento?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminará toda la información relacionada con este tratamiento.
+                </div>
+                <p><strong>Tratamiento:</strong> {{ tratamiento.nombre }}</p>
+                <p><strong>Paciente:</strong> {{ tratamiento.consulta.paciente.nombre }} {{ tratamiento.consulta.paciente.apellido }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'tratamientos_delete' tratamiento.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>
+                        Eliminar Tratamiento
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .status-indicator.active {
+        background-color: #198754;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.3);
+    }
+    
+    .status-indicator.pending {
+        background-color: #ffc107;
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-indicator.completed {
+        background-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.3);
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -25px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #dee2e6;
+    }
+    
+    .timeline-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .timeline-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        updateProgressAndStatus();
+    });
+    
+    function updateProgressAndStatus() {
+        const fechaInicio = '{{ tratamiento.fecha_inicio|date:"Y-m-d" }}';
+        const duracion = {{ tratamiento.duracion_dias }};
+        const progressInfo = document.getElementById('progress-info');
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const statusDescription = document.getElementById('status-description');
+        const endDateElement = document.getElementById('end-date');
+        
+        if (fechaInicio && fechaInicio !== 'None') {
+            const inicio = new Date(fechaInicio);
+            const fin = new Date(inicio);
+            fin.setDate(fin.getDate() + duracion);
+            const hoy = new Date();
+            
+            // Update end date
+            endDateElement.textContent = fin.toLocaleDateString('es-ES');
+            
+            let progressPercentage = 0;
+            let statusClass = '';
+            let statusTextContent = '';
+            let statusDescriptionContent = '';
+            
+            if (hoy < inicio) {
+                statusClass = 'pending';
+                statusTextContent = 'Pendiente';
+                statusDescriptionContent = 'Aún no ha comenzado';
+                progressPercentage = 0;
+            } else if (hoy > fin) {
+                statusClass = 'completed';
+                statusTextContent = 'Completado';
+                statusDescriptionContent = 'Tratamiento finalizado';
+                progressPercentage = 100;
+            } else {
+                statusClass = 'active';
+                statusTextContent = 'En Progreso';
+                statusDescriptionContent = 'Tratamiento activo';
+                const totalDias = (fin - inicio) / (1000 * 60 * 60 * 24);
+                const diasTranscurridos = (hoy - inicio) / (1000 * 60 * 60 * 24);
+                progressPercentage = Math.round((diasTranscurridos / totalDias) * 100);
+            }
+            
+            // Update status indicator
+            statusIndicator.className = `status-indicator ${statusClass}`;
+            statusText.textContent = statusTextContent;
+            statusDescription.textContent = statusDescriptionContent;
+            
+            // Update progress info
+            progressInfo.innerHTML = `
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">Progreso del Tratamiento</small>
+                        <small class="fw-bold">${progressPercentage}%</small>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="text-primary fw-bold">${Math.max(0, Math.round((hoy - inicio) / (1000 * 60 * 60 * 24)))}</div>
+                        <small class="text-muted">Días transcurridos</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-warning fw-bold">${Math.max(0, Math.round((fin - hoy) / (1000 * 60 * 60 * 24)))}</div>
+                        <small class="text-muted">Días restantes</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-success fw-bold">${duracion}</div>
+                        <small class="text-muted">Días totales</small>
+                    </div>
+                </div>
+            `;
+        } else {
+            endDateElement.textContent = 'Sin definir';
+            statusIndicator.className = 'status-indicator pending';
+            statusText.textContent = 'Sin Iniciar';
+            statusDescription.textContent = 'Fecha de inicio no definida';
+            progressInfo.innerHTML = '<p class="text-muted text-center">Defina la fecha de inicio para ver el progreso</p>';
+        }
+    }
+    
+    function addMedication() {
+        // This would redirect to medication creation with treatment pre-selected
+        window.location.href = '/medicamentos/create/?tratamiento={{ tratamiento.id }}';
+    }
+    
+    function printTreatment() {
+        window.print();
+    }
+    
+    function duplicateTreatment() {
+        if (confirm('¿Está seguro de que desea duplicar este tratamiento?')) {
+            const params = new URLSearchParams();
+            params.append('nombre', '{{ tratamiento.nombre }} (Copia)');
+            params.append('descripcion', '{{ tratamiento.descripcion }}');
+            params.append('duracion', '{{ tratamiento.duracion_dias }}');
+            {% if tratamiento.instrucciones %}
+            params.append('instrucciones', '{{ tratamiento.instrucciones }}');
+            {% endif %}
+            
+            window.location.href = '{% url "tratamientos_create" %}?' + params.toString();
+        }
+    }
+    
+    function viewPatientHistory() {
+        // This would show a modal or redirect to patient history
+        window.location.href = '{% url "pacientes_detail" tratamiento.consulta.paciente.id %}';
+    }
+</script>
+{% endblock %}

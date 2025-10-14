@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_description %}Panel de control principal del sistema médico{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="bi bi-people display-4 mb-2"></i>
+                <div class="stats-number">{{ total_pacientes }}</div>
+                <div>Pacientes</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="bi bi-person-badge display-4 mb-2"></i>
+                <div class="stats-number">{{ total_medicos }}</div>
+                <div>Médicos</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check display-4 mb-2"></i>
+                <div class="stats-number">{{ total_consultas }}</div>
+                <div>Consultas</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="bi bi-bookmark-star display-4 mb-2"></i>
+                <div class="stats-number">{{ total_especialidades }}</div>
+                <div>Especialidades</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'pacientes_create' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Nuevo Paciente
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'consultas_create' %}" class="btn btn-success w-100">
+                            <i class="bi bi-calendar-plus me-2"></i>
+                            Nueva Consulta
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'medicos_create' %}" class="btn btn-info w-100">
+                            <i class="bi bi-person-badge-fill me-2"></i>
+                            Nuevo Médico
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'recetas_create' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-prescription2 me-2"></i>
+                            Nueva Receta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Consultas Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if consultas_recientes %}
+                    <div class="list-group list-group-flush">
+                        {% for consulta in consultas_recientes %}
+                            <div class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</div>
+                                    <small class="text-muted">Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</small>
+                                    <br>
+                                    <small class="text-muted">{{ consulta.fecha_consulta|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ consulta.medico.especialidad.nombre }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'consultas_list' %}" class="btn btn-outline-primary btn-sm">Ver todas las consultas</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-calendar-x display-4 mb-2"></i>
+                        <p>No hay consultas registradas</p>
+                        <a href="{% url 'consultas_create' %}" class="btn btn-primary btn-sm">Crear primera consulta</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Estadísticas por Especialidad
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if especialidades_stats %}
+                    {% for stat in especialidades_stats %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <strong>{{ stat.nombre }}</strong>
+                                <br>
+                                <small class="text-muted">{{ stat.total_medicos }} médico{{ stat.total_medicos|pluralize }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">{{ stat.total_consultas }} consulta{{ stat.total_consultas|pluralize }}</span>
+                            </div>
+                        </div>
+                        <div class="progress mb-3" style="height: 6px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ stat.porcentaje }}%"></div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-bar-chart display-4 mb-2"></i>
+                        <p>No hay datos estadísticos disponibles</p>
+                        <a href="{% url 'especialidades_create' %}" class="btn btn-primary btn-sm">Crear especialidad</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Estado del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Sistema Activo</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-database-check text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Base de Datos</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-shield-check text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Seguridad</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-cloud-check text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Respaldos</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-speedometer2 text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Rendimiento</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-2">
+                            <i class="bi bi-heart-pulse text-success display-6"></i>
+                        </div>
+                        <small class="text-muted">Salud Vital</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
