@@ -34,65 +34,80 @@
                         <div class="info-item mb-3">
                             <label class="info-label">
                                 <i class="bi bi-tag me-2"></i>
-                                Nombre Comercial
+                                Nombre
                             </label>
                             <div class="info-value">{{ medicamento.nombre }}</div>
                         </div>
                         
                         <div class="info-item mb-3">
                             <label class="info-label">
-                                <i class="bi bi-prescription2 me-2"></i>
-                                Principio Activo
+                                <i class="bi bi-boxes me-2"></i>
+                                Stock
                             </label>
-                            <div class="info-value">{{ medicamento.principio_activo }}</div>
+                            <div class="info-value">
+                                <span class="badge {% if medicamento.stock_bajo %}bg-danger{% else %}bg-success{% endif %}">
+                                    {{ medicamento.stock }} unidades
+                                </span>
+                            </div>
                         </div>
                         
                         <div class="info-item mb-3">
                             <label class="info-label">
-                                <i class="bi bi-collection me-2"></i>
-                                Tipo
+                                <i class="bi bi-currency-dollar me-2"></i>
+                                Precio Unitario
                             </label>
-                            <div class="info-value">
-                                <span class="badge bg-primary medication-type-badge" data-type="{{ medicamento.tipo }}">
-                                    <i class="medication-type-icon me-1"></i>
-                                    {{ medicamento.get_tipo_display }}
-                                </span>
-                            </div>
+                            <div class="info-value">${{ medicamento.precio_unitario }}</div>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="info-item mb-3">
                             <label class="info-label">
-                                <i class="bi bi-speedometer me-2"></i>
-                                Concentración
-                            </label>
-                            <div class="info-value">{{ medicamento.concentracion }}</div>
-                        </div>
-                        
-                        <div class="info-item mb-3">
-                            <label class="info-label">
-                                <i class="bi bi-building me-2"></i>
-                                Laboratorio
-                            </label>
-                            <div class="info-value">{{ medicamento.laboratorio|default:"No especificado" }}</div>
-                        </div>
-                        
-                        <div class="info-item mb-3">
-                            <label class="info-label">
-                                <i class="bi bi-prescription me-2"></i>
-                                Requiere Receta
+                                <i class="bi bi-calendar-event me-2"></i>
+                                Fecha de Vencimiento
                             </label>
                             <div class="info-value">
-                                {% if medicamento.requiere_receta %}
-                                    <span class="badge bg-warning">
-                                        <i class="bi bi-prescription me-1"></i>
-                                        Sí, requiere receta
+                                <span class="badge {% if medicamento.proximo_vencimiento %}bg-warning{% else %}bg-info{% endif %}">
+                                    {{ medicamento.fecha_vencimiento|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="info-label">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Estado del Stock
+                            </label>
+                            <div class="info-value">
+                                {% if medicamento.stock_bajo %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Stock Bajo
                                     </span>
                                 {% else %}
                                     <span class="badge bg-success">
                                         <i class="bi bi-check-circle me-1"></i>
-                                        Venta libre
+                                        Stock Normal
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="info-label">
+                                <i class="bi bi-clock me-2"></i>
+                                Vencimiento
+                            </label>
+                            <div class="info-value">
+                                {% if medicamento.proximo_vencimiento %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Próximo a vencer
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Vigente
                                     </span>
                                 {% endif %}
                             </div>
@@ -116,66 +131,7 @@
             </div>
         </div>
         
-        <!-- Administration and Usage -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-arrow-right-circle me-2"></i>
-                    Administración y Uso
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-item mb-3">
-                            <label class="info-label">
-                                <i class="bi bi-arrow-right-circle me-2"></i>
-                                Vía de Administración
-                            </label>
-                            <div class="info-value">{{ medicamento.via_administracion|default:"No especificada" }}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                {% if medicamento.contraindicaciones %}
-                <div class="row">
-                    <div class="col-12">
-                        <div class="info-item mb-3">
-                            <label class="info-label">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                Contraindicaciones
-                            </label>
-                            <div class="info-value">
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    {{ medicamento.contraindicaciones }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if medicamento.efectos_secundarios %}
-                <div class="row">
-                    <div class="col-12">
-                        <div class="info-item">
-                            <label class="info-label">
-                                <i class="bi bi-shield-exclamation me-2"></i>
-                                Efectos Secundarios
-                            </label>
-                            <div class="info-value">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    {{ medicamento.efectos_secundarios }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+
         
         <!-- Related Prescriptions -->
         <div class="card mb-4">

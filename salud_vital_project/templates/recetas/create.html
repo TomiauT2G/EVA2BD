@@ -3,389 +3,276 @@
 {% block title %}Nueva Receta Médica - Sistema Salud Vital{% endblock %}
 
 {% block page_title %}Nueva Receta Médica{% endblock %}
-{% block page_description %}Crear una nueva prescripción médica{% endblock %}
+{% block page_description %}Prescribir medicamentos para un tratamiento específico{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+<a href="{% url 'recetas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Volver a la lista
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-prescription2 me-2"></i>
-                    Información de la Receta
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" class="needs-validation" novalidate>
-                    {% csrf_token %}
-                    
-                    <!-- Información básica -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="consulta" class="form-label">Consulta Médica *</label>
-                            <select class="form-select" id="consulta" name="consulta" required>
-                                <option value="">Seleccionar consulta...</option>
-                                {% for consulta in consultas %}
-                                    <option value="{{ consulta.id }}" 
-                                            data-paciente="{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}"
-                                            data-medico="Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}"
-                                            data-fecha="{{ consulta.fecha|date:'d/m/Y' }}"
-                                            data-diagnostico="{{ consulta.diagnostico }}">
-                                        {{ consulta.fecha|date:"d/m/Y" }} - {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }} (Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }})
+<div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Form -->
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-success-600">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Información de la Receta
+                    </h3>
+                </div>
+                
+                <div class="p-6">
+                    {% if form.errors %}
+                        <div class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                            <div class="flex">
+                                <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-medium text-red-800">Errores en el formulario:</h4>
+                                    <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Tratamiento -->
+                        <div>
+                            <label for="{{ form.tratamiento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                Tratamiento *
+                            </label>
+                            <select id="{{ form.tratamiento.id_for_label }}" name="{{ form.tratamiento.name }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.tratamiento.errors %}border-red-300{% endif %}">
+                                <option value="">Seleccione un tratamiento</option>
+                                {% for choice in form.tratamiento.field.queryset %}
+                                    <option value="{{ choice.pk }}" {% if form.tratamiento.value == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice }}
                                     </option>
                                 {% endfor %}
                             </select>
-                            <div class="invalid-feedback">
-                                Por favor seleccione una consulta médica.
-                            </div>
+                            {% if form.tratamiento.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {% for error in form.tratamiento.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">
+                                Seleccione el tratamiento al que pertenece esta receta
+                            </p>
                         </div>
-                        <div class="col-md-6">
-                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento *</label>
-                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" required>
-                            <div class="invalid-feedback">
-                                Por favor ingrese la fecha de vencimiento.
-                            </div>
-                            <small class="form-text text-muted">
-                                La receta será válida hasta esta fecha
-                            </small>
-                        </div>
-                    </div>
 
-                    <!-- Información de la consulta seleccionada -->
-                    <div id="consulta-info" class="alert alert-info d-none mb-4">
-                        <h6><i class="bi bi-info-circle me-2"></i>Información de la Consulta</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Paciente:</strong> <span id="info-paciente"></span><br>
-                                <strong>Médico:</strong> <span id="info-medico"></span>
+                        <!-- Medicamento -->
+                        <div>
+                            <label for="{{ form.medicamento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                </svg>
+                                Medicamento *
+                            </label>
+                            <select id="{{ form.medicamento.id_for_label }}" name="{{ form.medicamento.name }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.medicamento.errors %}border-red-300{% endif %}">
+                                <option value="">Seleccione un medicamento</option>
+                                {% for choice in form.medicamento.field.queryset %}
+                                    <option value="{{ choice.pk }}" {% if form.medicamento.value == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice.nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.medicamento.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {% for error in form.medicamento.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">
+                                Medicamento a prescribir
+                            </p>
+                        </div>
+
+                        <!-- Cantidad y Frecuencia -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.cantidad.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                                    </svg>
+                                    Cantidad *
+                                </label>
+                                <input type="number" id="{{ form.cantidad.id_for_label }}" name="{{ form.cantidad.name }}" value="{{ form.cantidad.value|default:'' }}" min="1" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.cantidad.errors %}border-red-300{% endif %}" placeholder="Ej: 30">
+                                {% if form.cantidad.errors %}
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {% for error in form.cantidad.errors %}{{ error }}{% endfor %}
+                                    </p>
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Cantidad de unidades a prescribir
+                                </p>
                             </div>
-                            <div class="col-md-6">
-                                <strong>Fecha:</strong> <span id="info-fecha"></span><br>
-                                <strong>Diagnóstico:</strong> <span id="info-diagnostico"></span>
+
+                            <div>
+                                <label for="{{ form.frecuencia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Frecuencia *
+                                </label>
+                                <input type="text" id="{{ form.frecuencia.id_for_label }}" name="{{ form.frecuencia.name }}" value="{{ form.frecuencia.value|default:'' }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.frecuencia.errors %}border-red-300{% endif %}" placeholder="Ej: Cada 8 horas">
+                                {% if form.frecuencia.errors %}
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {% for error in form.frecuencia.errors %}{{ error }}{% endfor %}
+                                    </p>
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Frecuencia de administración
+                                </p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Medicamentos -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Medicamentos Prescritos</h6>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMedicamento()">
-                                <i class="bi bi-plus-circle me-1"></i>Agregar Medicamento
+                        <!-- Duración -->
+                        <div>
+                            <label for="{{ form.duracion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Duración *
+                            </label>
+                            <input type="text" id="{{ form.duracion.id_for_label }}" name="{{ form.duracion.name }}" value="{{ form.duracion.value|default:'' }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.duracion.errors %}border-red-300{% endif %}" placeholder="Ej: 7 días">
+                            {% if form.duracion.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {% for error in form.duracion.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">
+                                Duración del tratamiento con este medicamento
+                            </p>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-between pt-6 border-t border-gray-200">
+                            <a href="{% url 'recetas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-success-600 hover:from-primary-700 hover:to-success-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Crear Receta
                             </button>
                         </div>
-                        
-                        <div id="medicamentos-container">
-                            <!-- Los medicamentos se agregarán dinámicamente aquí -->
-                        </div>
-                        
-                        <div class="text-muted text-center py-3" id="no-medicamentos">
-                            <i class="bi bi-capsule fs-1 d-block mb-2"></i>
-                            <p>No hay medicamentos agregados</p>
-                            <button type="button" class="btn btn-primary" onclick="addMedicamento()">
-                                <i class="bi bi-plus-circle me-2"></i>Agregar primer medicamento
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Observaciones -->
-                    <div class="mb-4">
-                        <label for="observaciones" class="form-label">Observaciones Generales</label>
-                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" 
-                                  placeholder="Instrucciones generales, precauciones especiales, etc."></textarea>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'recetas_list' %}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle me-2"></i>Crear Receta
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <!-- Vista previa de la receta -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-eye me-2"></i>Vista Previa
-                </h6>
-            </div>
-            <div class="card-body">
-                <div id="preview-content">
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-prescription2 fs-1 d-block mb-2"></i>
-                        <p>Seleccione una consulta para ver la vista previa</p>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
         
-        <!-- Ayuda -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-question-circle me-2"></i>Ayuda
-                </h6>
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Información Importante -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-blue-50 border-b border-blue-200">
+                    <h4 class="text-sm font-semibold text-blue-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Información Importante
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Todos los campos marcados con (*) son obligatorios</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>El tratamiento debe estar previamente registrado</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Verifique la disponibilidad del medicamento</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Especifique claramente la frecuencia y duración</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="small">
-                    <p><strong>Consejos:</strong></p>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-check text-success me-2"></i>Seleccione la consulta médica correspondiente</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Agregue todos los medicamentos necesarios</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Especifique dosis y frecuencia claramente</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Incluya observaciones importantes</li>
-                    </ul>
+
+            <!-- Consejos de Prescripción -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-yellow-50 border-b border-yellow-200">
+                    <h4 class="text-sm font-semibold text-yellow-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Consejos de Prescripción
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="bg-yellow-50 p-3 rounded-md">
+                            <p class="font-medium text-yellow-800 mb-1">Frecuencia:</p>
+                            <p>Use términos claros como "Cada 8 horas", "3 veces al día", "Antes de las comidas"</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-md">
+                            <p class="font-medium text-blue-800 mb-1">Duración:</p>
+                            <p>Especifique en días, semanas o meses. Ej: "7 días", "2 semanas", "1 mes"</p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-md">
+                            <p class="font-medium text-green-800 mb-1">Cantidad:</p>
+                            <p>Calcule la cantidad total necesaria según la frecuencia y duración</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Acciones Rápidas
+                    </h4>
+                </div>
+                <div class="p-4 space-y-2">
+                    <a href="{% url 'medicamentos_list' %}" class="block w-full text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        Ver Medicamentos
+                    </a>
+                    <a href="{% url 'tratamientos_list' %}" class="block w-full text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        Ver Tratamientos
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Template para medicamento -->
-<template id="medicamento-template">
-    <div class="card mb-3 medicamento-item">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <h6 class="card-title mb-0">Medicamento <span class="medicamento-number"></span></h6>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Medicamento *</label>
-                    <select class="form-select medicamento-select" name="medicamento[]" required>
-                        <option value="">Seleccionar medicamento...</option>
-                        {% for medicamento in medicamentos %}
-                            <option value="{{ medicamento.id }}" 
-                                    data-nombre="{{ medicamento.nombre_comercial }}"
-                                    data-principio="{{ medicamento.principio_activo }}"
-                                    data-concentracion="{{ medicamento.concentracion }}"
-                                    data-tipo="{{ medicamento.tipo }}">
-                                {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Dosis *</label>
-                    <input type="text" class="form-control" name="dosis[]" 
-                           placeholder="ej: 500mg, 1 comprimido" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Frecuencia *</label>
-                    <select class="form-select" name="frecuencia[]" required>
-                        <option value="">Seleccionar frecuencia...</option>
-                        <option value="Cada 4 horas">Cada 4 horas</option>
-                        <option value="Cada 6 horas">Cada 6 horas</option>
-                        <option value="Cada 8 horas">Cada 8 horas</option>
-                        <option value="Cada 12 horas">Cada 12 horas</option>
-                        <option value="Una vez al día">Una vez al día</option>
-                        <option value="Dos veces al día">Dos veces al día</option>
-                        <option value="Tres veces al día">Tres veces al día</option>
-                        <option value="Según necesidad">Según necesidad</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Duración</label>
-                    <input type="text" class="form-control" name="duracion[]" 
-                           placeholder="ej: 7 días, 2 semanas">
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Instrucciones Especiales</label>
-                    <textarea class="form-control" name="instrucciones[]" rows="2" 
-                              placeholder="Tomar con alimentos, antes de dormir, etc."></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .medicamento-item {
-        border-left: 4px solid var(--primary-color);
-    }
-    
-    .card-title {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-    
-    .preview-section {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .preview-header {
-        border-bottom: 2px solid var(--primary-color);
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-    }
-    
-    .medicamento-preview {
-        background-color: white;
-        border-radius: 6px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-left: 3px solid var(--secondary-color);
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    let medicamentoCounter = 0;
-    
-    // Configurar fecha mínima (hoy) y máxima (1 año)
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date();
-        const maxDate = new Date();
-        maxDate.setFullYear(today.getFullYear() + 1);
-        
-        const fechaVencimiento = document.getElementById('fecha_vencimiento');
-        fechaVencimiento.min = today.toISOString().split('T')[0];
-        fechaVencimiento.max = maxDate.toISOString().split('T')[0];
-        
-        // Establecer fecha por defecto (30 días)
-        const defaultDate = new Date();
-        defaultDate.setDate(today.getDate() + 30);
-        fechaVencimiento.value = defaultDate.toISOString().split('T')[0];
-    });
-    
-    // Manejar selección de consulta
-    document.getElementById('consulta').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const infoDiv = document.getElementById('consulta-info');
-        
-        if (selectedOption.value) {
-            document.getElementById('info-paciente').textContent = selectedOption.dataset.paciente;
-            document.getElementById('info-medico').textContent = selectedOption.dataset.medico;
-            document.getElementById('info-fecha').textContent = selectedOption.dataset.fecha;
-            document.getElementById('info-diagnostico').textContent = selectedOption.dataset.diagnostico;
-            infoDiv.classList.remove('d-none');
-            updatePreview();
-        } else {
-            infoDiv.classList.add('d-none');
-            updatePreview();
-        }
-    });
-    
-    function addMedicamento() {
-        medicamentoCounter++;
-        const template = document.getElementById('medicamento-template');
-        const clone = template.content.cloneNode(true);
-        
-        // Actualizar número del medicamento
-        clone.querySelector('.medicamento-number').textContent = medicamentoCounter;
-        
-        // Agregar event listeners
-        const selects = clone.querySelectorAll('select, input, textarea');
-        selects.forEach(element => {
-            element.addEventListener('change', updatePreview);
-            element.addEventListener('input', updatePreview);
-        });
-        
-        document.getElementById('medicamentos-container').appendChild(clone);
-        document.getElementById('no-medicamentos').style.display = 'none';
-        updatePreview();
-    }
-    
-    function removeMedicamento(button) {
-        button.closest('.medicamento-item').remove();
-        
-        // Renumerar medicamentos
-        const items = document.querySelectorAll('.medicamento-item');
-        items.forEach((item, index) => {
-            item.querySelector('.medicamento-number').textContent = index + 1;
-        });
-        
-        if (items.length === 0) {
-            document.getElementById('no-medicamentos').style.display = 'block';
-            medicamentoCounter = 0;
-        }
-        
-        updatePreview();
-    }
-    
-    function updatePreview() {
-        const consulta = document.getElementById('consulta');
-        const fechaVencimiento = document.getElementById('fecha_vencimiento');
-        const observaciones = document.getElementById('observaciones');
-        const previewContent = document.getElementById('preview-content');
-        
-        if (!consulta.value) {
-            previewContent.innerHTML = `
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-prescription2 fs-1 d-block mb-2"></i>
-                    <p>Seleccione una consulta para ver la vista previa</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const selectedOption = consulta.options[consulta.selectedIndex];
-        const medicamentos = document.querySelectorAll('.medicamento-item');
-        
-        let medicamentosHtml = '';
-        medicamentos.forEach((item, index) => {
-            const medicamentoSelect = item.querySelector('.medicamento-select');
-            const dosis = item.querySelector('input[name="dosis[]"]').value;
-            const frecuencia = item.querySelector('select[name="frecuencia[]"]').value;
-            const duracion = item.querySelector('input[name="duracion[]"]').value;
-            const instrucciones = item.querySelector('textarea[name="instrucciones[]"]').value;
-            
-            if (medicamentoSelect.value) {
-                const medicamentoOption = medicamentoSelect.options[medicamentoSelect.selectedIndex];
-                medicamentosHtml += `
-                    <div class="medicamento-preview">
-                        <strong>${medicamentoOption.dataset.nombre}</strong>
-                        <br><small class="text-muted">${medicamentoOption.dataset.principio} - ${medicamentoOption.dataset.concentracion}</small>
-                        ${dosis ? `<br><strong>Dosis:</strong> ${dosis}` : ''}
-                        ${frecuencia ? `<br><strong>Frecuencia:</strong> ${frecuencia}` : ''}
-                        ${duracion ? `<br><strong>Duración:</strong> ${duracion}` : ''}
-                        ${instrucciones ? `<br><strong>Instrucciones:</strong> ${instrucciones}` : ''}
-                    </div>
-                `;
-            }
-        });
-        
-        previewContent.innerHTML = `
-            <div class="preview-section">
-                <div class="preview-header">
-                    <h6 class="mb-0">RECETA MÉDICA</h6>
-                </div>
-                <p><strong>Paciente:</strong> ${selectedOption.dataset.paciente}</p>
-                <p><strong>Médico:</strong> ${selectedOption.dataset.medico}</p>
-                <p><strong>Fecha:</strong> ${selectedOption.dataset.fecha}</p>
-                <p><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
-                
-                <h6 class="mt-3 mb-2">Medicamentos:</h6>
-                ${medicamentosHtml || '<p class="text-muted">No hay medicamentos agregados</p>'}
-                
-                ${observaciones.value ? `<h6 class="mt-3 mb-2">Observaciones:</h6><p>${observaciones.value}</p>` : ''}
-            </div>
-        `;
-    }
-    
-    // Event listeners para actualizar vista previa
-    document.getElementById('fecha_vencimiento').addEventListener('change', updatePreview);
-    document.getElementById('observaciones').addEventListener('input', updatePreview);
-</script>
 {% endblock %}

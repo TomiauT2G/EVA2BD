@@ -61,6 +61,22 @@
                                 <p class="fw-bold">{{ medico.numero_licencia }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Estado</label>
+                                <p class="fw-bold">
+                                    {% if medico.activo %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Activo
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Inactivo
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Email</label>
                                 <p class="fw-bold">
                                     <a href="mailto:{{ medico.email }}" class="text-decoration-none">

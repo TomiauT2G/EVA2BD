@@ -95,6 +95,7 @@
                                 </div>
                             {% endif %}
                         </div>
+
                     </div>
                     
                     <!-- Contact Information -->
@@ -251,6 +252,7 @@
             const rut = document.getElementById('{{ form.rut.id_for_label }}').value;
             const fechaNacimiento = document.getElementById('{{ form.fecha_nacimiento.id_for_label }}').value;
             const telefono = document.getElementById('{{ form.telefono.id_for_label }}').value;
+
             
             if (nombre || apellido || rut) {
                 let edad = '';
@@ -269,6 +271,7 @@
                     <div class="text-start">
                         <p class="mb-1"><strong>${nombre} ${apellido}</strong>${edad}</p>
                         ${rut ? `<p class="mb-1 text-muted">RUT: ${rut}</p>` : ''}
+
                         ${telefono ? `<p class="mb-1 text-muted">Tel: ${telefono}</p>` : ''}
                     </div>
                 `;
@@ -282,6 +285,7 @@
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', updatePreview);
+                element.addEventListener('change', updatePreview);
             }
         });
     });

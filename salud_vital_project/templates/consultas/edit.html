@@ -6,116 +6,143 @@
 {% block page_description %}Modificar información de la consulta médica{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'consultas_detail' consulta.id %}" class="btn btn-outline-info me-2">
-    <i class="bi bi-eye me-2"></i>
+<a href="{% url 'consultas_detail' consulta.id %}" class="inline-flex items-center px-4 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 mr-3">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+    </svg>
     Ver Detalles
 </a>
-<a href="{% url 'consultas_list' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-2"></i>
+<a href="{% url 'consultas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
     Volver a Lista
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-pencil-square me-2"></i>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-xl font-semibold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
                     Editar Consulta Médica #{{ consulta.id }}
                 </h5>
             </div>
             
-            <div class="card-body">
-                <form method="POST" class="needs-validation" novalidate>
+            <div class="p-6">
+                <form method="POST" class="space-y-6" id="consulta-form" novalidate>
                     {% csrf_token %}
                     
                     <!-- Patient and Doctor Information -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-primary border-bottom pb-2 mb-3">
-                                <i class="bi bi-people me-2"></i>
+                    <div class="space-y-6">
+                        <div>
+                            <h6 class="text-lg font-semibold text-blue-600 border-b border-blue-200 pb-2 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
                                 Información de Participantes
                             </h6>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.paciente.id_for_label }}" class="form-label">
-                                <i class="bi bi-person me-1"></i>
-                                Paciente *
-                            </label>
-                            {{ form.paciente }}
-                            {% if form.paciente.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.paciente.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.medico.id_for_label }}" class="form-label">
-                                <i class="bi bi-person-badge me-1"></i>
-                                Médico *
-                            </label>
-                            {{ form.medico }}
-                            {% if form.medico.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.medico.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.paciente.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Paciente *
+                                </label>
+                                {{ form.paciente }}
+                                {% if form.paciente.errors %}
+                                    <div class="mt-1 text-sm text-red-600">
+                                        {% for error in form.paciente.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.medico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                    </svg>
+                                    Médico *
+                                </label>
+                                {{ form.medico }}
+                                {% if form.medico.errors %}
+                                    <div class="mt-1 text-sm text-red-600">
+                                        {% for error in form.medico.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Consultation Details -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-primary border-bottom pb-2 mb-3">
-                                <i class="bi bi-clipboard-data me-2"></i>
+                    <div class="space-y-6">
+                        <div>
+                            <h6 class="text-lg font-semibold text-blue-600 border-b border-blue-200 pb-2 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2m0-13h10a2 2 0 012 2v11a2 2 0 01-2 2H9m0-13v13"></path>
+                                </svg>
                                 Detalles de la Consulta
                             </h6>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.fecha_consulta.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar me-1"></i>
-                                Fecha y Hora de Consulta *
-                            </label>
-                            {{ form.fecha_consulta }}
-                            {% if form.fecha_consulta.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.fecha_consulta.errors %}
-                                        {{ error }}
-                                    {% endfor %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.fecha_consulta.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Fecha y Hora de Consulta *
+                                </label>
+                                {{ form.fecha_consulta }}
+                                {% if form.fecha_consulta.errors %}
+                                    <div class="mt-1 text-sm text-red-600">
+                                        {% for error in form.fecha_consulta.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="especialidad_display" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    Especialidad
+                                </label>
+                                <input type="text" class="form-input bg-gray-50" id="especialidad_display" 
+                                       value="{{ consulta.medico.especialidad.nombre }}" readonly>
+                                <div class="mt-1 text-xs text-gray-500 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Se asigna automáticamente según el médico seleccionado
                                 </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="especialidad_display" class="form-label">
-                                <i class="bi bi-heart-pulse me-1"></i>
-                                Especialidad
-                            </label>
-                            <input type="text" class="form-control" id="especialidad_display" 
-                                   value="{{ consulta.medico.especialidad.nombre }}" readonly>
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Se asigna automáticamente según el médico seleccionado
                             </div>
                         </div>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.motivo_consulta.id_for_label }}" class="form-label">
-                                <i class="bi bi-chat-text me-1"></i>
+                        <div>
+                            <label for="{{ form.motivo_consulta.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
                                 Motivo de Consulta *
                             </label>
                             {{ form.motivo_consulta }}
                             {% if form.motivo_consulta.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600">
                                     {% for error in form.motivo_consulta.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -123,14 +150,16 @@
                             {% endif %}
                         </div>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.diagnostico.id_for_label }}" class="form-label">
-                                <i class="bi bi-clipboard-check me-1"></i>
+                        <div>
+                            <label for="{{ form.diagnostico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 Diagnóstico
                             </label>
                             {{ form.diagnostico }}
                             {% if form.diagnostico.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600">
                                     {% for error in form.diagnostico.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -138,14 +167,16 @@
                             {% endif %}
                         </div>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
-                                <i class="bi bi-journal-text me-1"></i>
+                        <div>
+                            <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
                                 Observaciones Adicionales
                             </label>
                             {{ form.observaciones }}
                             {% if form.observaciones.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600">
                                     {% for error in form.observaciones.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -154,19 +185,20 @@
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
-                                    <i class="bi bi-x-circle me-2"></i>
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Guardar Cambios
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Form Actions -->
+                    <div class="flex justify-between pt-6 border-t border-gray-200">
+                        <a href="{% url 'consultas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Guardar Cambios
+                        </button>
                     </div>
                 </form>
             </div>
@@ -174,95 +206,117 @@
     </div>
     
     <!-- Preview Card -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-eye me-2"></i>
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-4 py-3 border-b border-gray-200">
+                <h6 class="text-sm font-semibold text-gray-900 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
                     Vista Previa
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="text-center mb-3">
-                    <div class="avatar-circle bg-primary text-white d-inline-flex align-items-center justify-content-center">
-                        <i class="bi bi-clipboard-data fs-3"></i>
+            <div class="p-4">
+                <div class="text-center mb-4">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2m0-13h10a2 2 0 012 2v11a2 2 0 01-2 2H9m0-13v13"></path>
+                        </svg>
                     </div>
                 </div>
                 
-                <div id="preview-content">
-                    <div class="text-start">
-                        <p class="mb-1"><strong>Paciente:</strong> {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</p>
-                        <p class="mb-1"><strong>Médico:</strong> Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</p>
-                        <p class="mb-1"><strong>Especialidad:</strong> {{ consulta.medico.especialidad.nombre }}</p>
-                        <p class="mb-1"><strong>Fecha:</strong> {{ consulta.fecha_consulta|date:"d/m/Y H:i" }}</p>
-                        {% if consulta.motivo_consulta %}
-                        <p class="mb-1"><strong>Motivo:</strong> {{ consulta.motivo_consulta|truncatechars:50 }}</p>
-                        {% endif %}
-                        {% if consulta.diagnostico %}
-                        <p class="mb-1"><strong>Diagnóstico:</strong> {{ consulta.diagnostico|truncatechars:50 }}</p>
-                        {% endif %}
-                    </div>
+                <div id="preview-content" class="space-y-2 text-sm">
+                    <p><span class="font-medium text-gray-700">Paciente:</span> <span class="text-gray-900">{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</span></p>
+                    <p><span class="font-medium text-gray-700">Médico:</span> <span class="text-gray-900">Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</span></p>
+                    <p><span class="font-medium text-gray-700">Especialidad:</span> <span class="text-gray-900">{{ consulta.medico.especialidad.nombre }}</span></p>
+                    <p><span class="font-medium text-gray-700">Fecha:</span> <span class="text-gray-900">{{ consulta.fecha_consulta|date:"d/m/Y H:i" }}</span></p>
+                    {% if consulta.motivo_consulta %}
+                    <p><span class="font-medium text-gray-700">Motivo:</span> <span class="text-gray-900">{{ consulta.motivo_consulta|truncatechars:50 }}</span></p>
+                    {% endif %}
+                    {% if consulta.diagnostico %}
+                    <p><span class="font-medium text-gray-700">Diagnóstico:</span> <span class="text-gray-900">{{ consulta.diagnostico|truncatechars:50 }}</span></p>
+                    {% endif %}
                 </div>
             </div>
         </div>
         
         <!-- Information Card -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-4 py-3 border-b border-gray-200">
+                <h6 class="text-sm font-semibold text-gray-900 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     Información de la Consulta
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6">
-                        <div class="border-end">
-                            <h6 class="text-primary mb-1">{{ consulta.id }}</h6>
-                            <small class="text-muted">ID Consulta</small>
-                        </div>
+            <div class="p-4">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="text-center p-3 border-r border-gray-200">
+                        <svg class="w-6 h-6 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                        </svg>
+                        <div class="text-xs text-gray-500">ID Consulta</div>
+                        <div class="text-sm font-semibold text-blue-600">{{ consulta.id }}</div>
                     </div>
-                    <div class="col-6">
-                        <h6 class="text-success mb-1">{{ consulta.fecha_consulta|date:"d/m/Y" }}</h6>
-                        <small class="text-muted">Fecha</small>
+                    <div class="text-center p-3">
+                        <svg class="w-6 h-6 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <div class="text-xs text-gray-500">Fecha</div>
+                        <div class="text-sm font-semibold text-green-600">{{ consulta.fecha_consulta|date:"d/m/Y" }}</div>
                     </div>
                 </div>
                 
-                <hr class="my-3">
-                
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        Los campos marcados con * son obligatorios
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        Cambios se guardan inmediatamente
-                    </li>
-                    <li class="mb-0">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        Historial de cambios se mantiene
-                    </li>
-                </ul>
+                <div class="border-t border-gray-200 pt-4">
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-sm">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-600">Los campos marcados con * son obligatorios</span>
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-600">Cambios se guardan inmediatamente</span>
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-600">Historial de cambios se mantiene</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         
         <!-- Related Actions -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-gear me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-4 py-3 border-b border-gray-200">
+                <h6 class="text-sm font-semibold text-gray-900 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
                     Acciones Relacionadas
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'tratamientos_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-success btn-sm">
-                        <i class="bi bi-plus-circle me-2"></i>
+            <div class="p-4">
+                <div class="space-y-2">
+                    <a href="{% url 'tratamientos_create' %}?consulta={{ consulta.id }}" class="w-full inline-flex items-center justify-center px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
                         Agregar Tratamiento
                     </a>
-                    <a href="{% url 'recetas_create' %}?consulta={{ consulta.id }}" class="btn btn-outline-info btn-sm">
-                        <i class="bi bi-prescription2 me-2"></i>
+                    <a href="{% url 'recetas_create' %}?consulta={{ consulta.id }}" class="w-full inline-flex items-center justify-center px-3 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2m0-13h10a2 2 0 012 2v11a2 2 0 01-2 2H9m0-13v13"></path>
+                        </svg>
                         Crear Receta Médica
                     </a>
                 </div>
@@ -274,18 +328,24 @@
 
 {% block extra_css %}
 <style>
-    .avatar-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+    .form-input {
+        @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
     }
     
-    .needs-validation .form-control:invalid {
-        border-color: #dc3545;
+    .form-input:invalid {
+        @apply border-red-300 focus:border-red-500 focus:ring-red-500;
     }
     
-    .needs-validation .form-control:valid {
-        border-color: #198754;
+    .form-input:valid {
+        @apply border-green-300 focus:border-green-500 focus:ring-green-500;
+    }
+    
+    .form-textarea {
+        @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none;
+    }
+    
+    .form-select {
+        @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
     }
 </style>
 {% endblock %}
@@ -293,57 +353,74 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.needs-validation');
+        const form = document.querySelector('#consulta-form');
         const previewContent = document.getElementById('preview-content');
         const medicoSelect = document.getElementById('{{ form.medico.id_for_label }}');
         const especialidadDisplay = document.getElementById('especialidad_display');
         
-        // Form validation
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        });
+        // Form validation with Tailwind classes
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+                        input.classList.remove('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+                        input.classList.add('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
+                    }
+                });
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }
         
         // Update specialty when doctor changes
-        medicoSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.value) {
-                // Extract specialty from option text (assuming format: "Dr. Name - Specialty")
-                const optionText = selectedOption.text;
-                const specialtyMatch = optionText.match(/- (.+)$/);
-                if (specialtyMatch) {
-                    especialidadDisplay.value = specialtyMatch[1];
+        if (medicoSelect) {
+            medicoSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    // Extract specialty from option text (assuming format: "Dr. Name - Specialty")
+                    const optionText = selectedOption.text;
+                    const specialtyMatch = optionText.match(/- (.+)$/);
+                    if (specialtyMatch) {
+                        especialidadDisplay.value = specialtyMatch[1];
+                    } else {
+                        especialidadDisplay.value = 'Especialidad no especificada';
+                    }
                 } else {
-                    especialidadDisplay.value = 'Especialidad no especificada';
+                    especialidadDisplay.value = '';
                 }
-            } else {
-                especialidadDisplay.value = '';
-            }
-            updatePreview();
-        });
+                updatePreview();
+            });
+        }
         
-        // Real-time preview
+        // Real-time preview with Tailwind classes
         function updatePreview() {
             const paciente = document.getElementById('{{ form.paciente.id_for_label }}');
-            const pacienteText = paciente.options[paciente.selectedIndex]?.text || '';
+            const pacienteText = paciente?.options[paciente.selectedIndex]?.text || '';
             const medico = document.getElementById('{{ form.medico.id_for_label }}');
-            const medicoText = medico.options[medico.selectedIndex]?.text || '';
-            const fecha = document.getElementById('{{ form.fecha_consulta.id_for_label }}').value;
-            const motivo = document.getElementById('{{ form.motivo_consulta.id_for_label }}').value;
-            const diagnostico = document.getElementById('{{ form.diagnostico.id_for_label }}').value;
+            const medicoText = medico?.options[medico.selectedIndex]?.text || '';
+            const fecha = document.getElementById('{{ form.fecha_consulta.id_for_label }}')?.value || '';
+            const motivo = document.getElementById('{{ form.motivo_consulta.id_for_label }}')?.value || '';
+            const diagnostico = document.getElementById('{{ form.diagnostico.id_for_label }}')?.value || '';
             
-            if (pacienteText || medicoText || fecha) {
+            if (previewContent && (pacienteText || medicoText || fecha)) {
                 previewContent.innerHTML = `
-                    <div class="text-start">
-                        ${pacienteText ? `<p class="mb-1"><strong>Paciente:</strong> ${pacienteText}</p>` : ''}
-                        ${medicoText ? `<p class="mb-1"><strong>Médico:</strong> ${medicoText}</p>` : ''}
-                        ${especialidadDisplay.value ? `<p class="mb-1"><strong>Especialidad:</strong> ${especialidadDisplay.value}</p>` : ''}
-                        ${fecha ? `<p class="mb-1"><strong>Fecha:</strong> ${new Date(fecha).toLocaleString('es-ES')}</p>` : ''}
-                        ${motivo ? `<p class="mb-1"><strong>Motivo:</strong> ${motivo.substring(0, 50)}${motivo.length > 50 ? '...' : ''}</p>` : ''}
-                        ${diagnostico ? `<p class="mb-1"><strong>Diagnóstico:</strong> ${diagnostico.substring(0, 50)}${diagnostico.length > 50 ? '...' : ''}</p>` : ''}
+                    <div class="space-y-2 text-sm">
+                        ${pacienteText ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Paciente:</span><span class="text-gray-900">${pacienteText}</span></p>` : ''}
+                        ${medicoText ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Médico:</span><span class="text-gray-900">${medicoText}</span></p>` : ''}
+                        ${especialidadDisplay?.value ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Especialidad:</span><span class="text-gray-900">${especialidadDisplay.value}</span></p>` : ''}
+                        ${fecha ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Fecha:</span><span class="text-gray-900">${new Date(fecha).toLocaleString('es-ES')}</span></p>` : ''}
+                        ${motivo ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Motivo:</span><span class="text-gray-900">${motivo.substring(0, 50)}${motivo.length > 50 ? '...' : ''}</span></p>` : ''}
+                        ${diagnostico ? `<p class="flex items-start"><span class="font-medium text-gray-700 mr-2">Diagnóstico:</span><span class="text-gray-900">${diagnostico.substring(0, 50)}${diagnostico.length > 50 ? '...' : ''}</span></p>` : ''}
                     </div>
                 `;
             }

@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Historial Clínico - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Nuevo Historial Clínico{% endblock %}
+{% block page_description %}Crear un nuevo historial clínico en el sistema{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'historiales_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Volver a Lista
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-success-600">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Información del Historial Clínico
+            </h3>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Por favor corrija los siguientes errores:
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Paciente -->
+            <div>
+                <label for="{{ form.paciente.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Paciente *
+                </label>
+                {{ form.paciente }}
+                {% if form.paciente.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.paciente.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tipo de Sangre -->
+                <div>
+                    <label for="{{ form.tipo_sangre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Sangre
+                    </label>
+                    {{ form.tipo_sangre }}
+                    {% if form.tipo_sangre.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.tipo_sangre.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Peso -->
+                <div>
+                    <label for="{{ form.peso.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Peso (kg)
+                    </label>
+                    {{ form.peso }}
+                    {% if form.peso.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.peso.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Altura -->
+                <div>
+                    <label for="{{ form.altura.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Altura (cm)
+                    </label>
+                    {{ form.altura }}
+                    {% if form.altura.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.altura.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Presión Arterial -->
+                <div>
+                    <label for="{{ form.presion_arterial.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Presión Arterial
+                    </label>
+                    {{ form.presion_arterial }}
+                    {% if form.presion_arterial.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.presion_arterial.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Alergias -->
+            <div>
+                <label for="{{ form.alergias.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Alergias
+                </label>
+                {{ form.alergias }}
+                {% if form.alergias.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.alergias.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Enfermedades Crónicas -->
+            <div>
+                <label for="{{ form.enfermedades_cronicas.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Enfermedades Crónicas
+                </label>
+                {{ form.enfermedades_cronicas }}
+                {% if form.enfermedades_cronicas.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.enfermedades_cronicas.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Medicamentos Actuales -->
+            <div>
+                <label for="{{ form.medicamentos_actuales.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Medicamentos Actuales
+                </label>
+                {{ form.medicamentos_actuales }}
+                {% if form.medicamentos_actuales.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.medicamentos_actuales.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Antecedentes Familiares -->
+            <div>
+                <label for="{{ form.antecedentes_familiares.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Antecedentes Familiares
+                </label>
+                {{ form.antecedentes_familiares }}
+                {% if form.antecedentes_familiares.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.antecedentes_familiares.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Antecedentes Quirúrgicos -->
+            <div>
+                <label for="{{ form.antecedentes_quirurgicos.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Antecedentes Quirúrgicos
+                </label>
+                {{ form.antecedentes_quirurgicos }}
+                {% if form.antecedentes_quirurgicos.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.antecedentes_quirurgicos.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Observaciones -->
+            <div>
+                <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Observaciones Generales
+                </label>
+                {{ form.observaciones }}
+                {% if form.observaciones.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.observaciones.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'historiales_list' %}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Crear Historial
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-calculate BMI if weight and height are provided
+    const pesoInput = document.getElementById('{{ form.peso.id_for_label }}');
+    const alturaInput = document.getElementById('{{ form.altura.id_for_label }}');
+    
+    function calculateBMI() {
+        const peso = parseFloat(pesoInput.value);
+        const altura = parseFloat(alturaInput.value);
+        
+        if (peso && altura && altura > 0) {
+            const alturaMetros = altura / 100;
+            const bmi = peso / (alturaMetros * alturaMetros);
+            
+            // You could display BMI somewhere if needed
+            console.log('BMI calculado:', bmi.toFixed(2));
+        }
+    }
+    
+    if (pesoInput && alturaInput) {
+        pesoInput.addEventListener('input', calculateBMI);
+        alturaInput.addEventListener('input', calculateBMI);
+    }
+});
+</script>
+{% endblock %}

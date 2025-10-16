@@ -6,289 +6,369 @@
 {% block page_description %}Gestión de consultas médicas del sistema{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'consultas_create' %}" class="btn btn-primary">
-    <i class="bi bi-plus-circle me-2"></i>
+<a href="{% url 'consultas_create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+    </svg>
     Nueva Consulta
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <!-- Filters Card -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="search" class="form-label">
-                            <i class="bi bi-search me-1"></i>
-                            Buscar
-                        </label>
-                        <input type="text" class="form-control" id="search" name="search" 
-                               value="{{ search }}" placeholder="Paciente, médico o diagnóstico...">
-                    </div>
-                    
-                    <div class="col-md-3">
-                        <label for="medico" class="form-label">
-                            <i class="bi bi-person-badge me-1"></i>
-                            Médico
-                        </label>
-                        <select class="form-select" id="medico" name="medico">
-                            <option value="">Todos los médicos</option>
-                            {% for med in medicos %}
-                                <option value="{{ med.id }}" {% if medico == med.id|stringformat:"s" %}selected{% endif %}>
-                                    Dr. {{ med.nombre }} {{ med.apellido }} - {{ med.especialidad.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-3">
-                        <label for="fecha_desde" class="form-label">
-                            <i class="bi bi-calendar me-1"></i>
-                            Desde
-                        </label>
-                        <input type="date" class="form-control" id="fecha_desde" name="fecha_desde" value="{{ fecha_desde }}">
-                    </div>
-                    
-                    <div class="col-md-2">
-                        <label for="fecha_hasta" class="form-label">Hasta</label>
-                        <input type="date" class="form-control" id="fecha_hasta" name="fecha_hasta" value="{{ fecha_hasta }}">
-                    </div>
-                    
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-outline-primary me-2">
-                            <i class="bi bi-funnel me-2"></i>
-                            Filtrar
-                        </button>
-                        <a href="{% url 'consultas_list' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Limpiar
-                        </a>
-                    </div>
-                </form>
-            </div>
+<div class="space-y-6">
+    <!-- Filters Section -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-success-600">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+                </svg>
+                Filtros de Búsqueda
+            </h3>
         </div>
+        <div class="p-6">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="lg:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Buscar
+                    </label>
+                    <input type="text" id="search" name="search" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200" 
+                           value="{{ search }}" placeholder="Paciente, médico o diagnóstico...">
+                </div>
+                
+                <div>
+                    <label for="medico" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        Médico
+                    </label>
+                    <select id="medico" name="medico" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        <option value="">Todos los médicos</option>
+                        {% for med in medicos %}
+                            <option value="{{ med.id }}" {% if medico == med.id|stringformat:"s" %}selected{% endif %}>
+                                Dr. {{ med.nombre }} {{ med.apellido }} - {{ med.especialidad.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="fecha_desde" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Desde
+                    </label>
+                    <input type="date" id="fecha_desde" name="fecha_desde" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200" 
+                           value="{{ fecha_desde }}">
+                </div>
+                
+                <div>
+                    <label for="fecha_hasta" class="block text-sm font-medium text-gray-700 mb-2">Hasta</label>
+                    <input type="date" id="fecha_hasta" name="fecha_hasta" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200" 
+                           value="{{ fecha_hasta }}">
+                </div>
+                
+                <div class="lg:col-span-4 flex gap-2">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+                        </svg>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'consultas_list' %}" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <!-- Results Card -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-clipboard-data me-2"></i>
-                    Lista de Consultas
-                    {% if page_obj.paginator.count %}
-                        <span class="badge bg-primary ms-2">{{ page_obj.paginator.count }}</span>
-                    {% endif %}
-                </h5>
+    <!-- Results Section -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Lista de Consultas
+                {% if page_obj.paginator.count %}
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                        {{ page_obj.paginator.count }}
+                    </span>
+                {% endif %}
+            </h3>
+        </div>
+        
+        {% if page_obj %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médico</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especialidad</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Diagnóstico</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for consulta in page_obj %}
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-gray-900">{{ consulta.fecha_consulta|date:"d/m/Y" }}</span>
+                                        <span class="text-sm text-gray-500">{{ consulta.fecha_consulta|time:"H:i" }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</div>
+                                            <div class="text-sm text-gray-500">{{ consulta.paciente.numero_documento }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</div>
+                                            <div class="text-sm text-gray-500">{{ consulta.medico.numero_documento }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                                        {{ consulta.medico.especialidad.nombre }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ consulta.diagnostico }}">
+                                        {{ consulta.diagnostico|default:"Sin diagnóstico" }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if consulta.tratamiento_set.exists %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Con Tratamiento
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Pendiente
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                    <div class="flex justify-center space-x-2">
+                                        <a href="{% url 'consultas_detail' consulta.pk %}" 
+                                           class="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200" 
+                                           title="Ver detalles">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="{% url 'consultas_edit' consulta.pk %}" 
+                                           class="text-yellow-600 hover:text-yellow-900 p-2 rounded-lg hover:bg-yellow-50 transition-colors duration-200" 
+                                           title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                        <button type="button" 
+                                                class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200" 
+                                                title="Eliminar"
+                                                onclick="deleteConsulta('{{ consulta.pk }}', '{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}', '{{ consulta.fecha_consulta|date:'d/m/Y H:i' }}')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             
-            <div class="card-body p-0">
-                {% if page_obj %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Paciente</th>
-                                    <th>Médico</th>
-                                    <th>Especialidad</th>
-                                    <th>Diagnóstico</th>
-                                    <th>Estado</th>
-                                    <th class="text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for consulta in page_obj %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-bold">{{ consulta.fecha_consulta|date:"d/m/Y" }}</span>
-                                                <small class="text-muted">{{ consulta.fecha_consulta|time:"H:i" }}</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle bg-info text-white me-2">
-                                                    <i class="bi bi-person-fill"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}</div>
-                                                    <small class="text-muted">{{ consulta.paciente.rut }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle bg-success text-white me-2">
-                                                    <i class="bi bi-person-badge-fill"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}</div>
-                                                    <small class="text-muted">{{ consulta.medico.rut }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary">{{ consulta.medico.especialidad.nombre }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="text-truncate" style="max-width: 200px;" title="{{ consulta.diagnostico }}">
-                                                {{ consulta.diagnostico|default:"Sin diagnóstico" }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {% if consulta.tratamiento_set.exists %}
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Con Tratamiento
-                                                </span>
-                                            {% else %}
-                                                <span class="badge bg-warning">
-                                                    <i class="bi bi-clock me-1"></i>
-                                                    Pendiente
-                                                </span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <a href="{% url 'consultas_detail' consulta.pk %}" 
-                                                   class="btn btn-sm btn-outline-info" title="Ver detalles">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a href="{% url 'consultas_edit' consulta.pk %}" 
-                                                   class="btn btn-sm btn-outline-primary" title="Editar">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                        title="Eliminar" data-bs-toggle="modal" 
-                                                        data-bs-target="#deleteModal{{ consulta.pk }}">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Anterior
+                            </a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Siguiente
+                            </a>
+                        {% endif %}
                     </div>
-                    
-                    <!-- Pagination -->
-                    {% if page_obj.has_other_pages %}
-                        <div class="card-footer">
-                            <nav aria-label="Navegación de consultas">
-                                <ul class="pagination justify-content-center mb-0">
-                                    {% if page_obj.has_previous %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}">
-                                                <i class="bi bi-chevron-double-left"></i>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}">
-                                                <i class="bi bi-chevron-left"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                    
-                                    <li class="page-item active">
-                                        <span class="page-link">
-                                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                                        </span>
-                                    </li>
-                                    
-                                    {% if page_obj.has_next %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}">
-                                                <i class="bi bi-chevron-right"></i>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}">
-                                                <i class="bi bi-chevron-double-right"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Página <span class="font-medium">{{ page_obj.number }}</span> de <span class="font-medium">{{ page_obj.paginator.num_pages }}</span>
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                                        </svg>
+                                    </a>
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                                
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-primary-50 text-sm font-medium text-primary-600">
+                                    {{ page_obj.number }}
+                                </span>
+                                
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if medico %}&medico={{ medico }}{% endif %}{% if fecha_desde %}&fecha_desde={{ fecha_desde }}{% endif %}{% if fecha_hasta %}&fecha_hasta={{ fecha_hasta }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                                        </svg>
+                                    </a>
+                                {% endif %}
                             </nav>
                         </div>
-                    {% endif %}
-                {% else %}
-                    <div class="text-center py-5">
-                        <i class="bi bi-clipboard-x display-1 text-muted"></i>
-                        <h4 class="mt-3">No se encontraron consultas</h4>
-                        <p class="text-muted">No hay consultas médicas registradas que coincidan con los criterios de búsqueda.</p>
-                        <a href="{% url 'consultas_create' %}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            Registrar Primera Consulta
-                        </a>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">No se encontraron consultas</h3>
+                <p class="mt-2 text-gray-500">No hay consultas médicas registradas que coincidan con los criterios de búsqueda.</p>
+                <div class="mt-6">
+                    <a href="{% url 'consultas_create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Registrar Primera Consulta
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Confirmar Eliminación</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">
+                    ¿Está seguro que desea eliminar la consulta médica?
+                </p>
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <div class="text-sm text-left">
+                        <p><strong>Paciente:</strong> <span id="consultaPaciente"></span></p>
+                        <p><strong>Fecha:</strong> <span id="consultaFecha"></span></p>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                <strong>Atención:</strong> Esta acción no se puede deshacer y eliminará todos los tratamientos asociados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="cancelDelete" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancelar
+                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Eliminar
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Delete Modals -->
-{% for consulta in page_obj %}
-    <div class="modal fade" id="deleteModal{{ consulta.pk }}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                        Confirmar Eliminación
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Está seguro que desea eliminar la consulta médica?</p>
-                    <div class="alert alert-warning">
-                        <strong>Paciente:</strong> {{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}<br>
-                        <strong>Médico:</strong> Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}<br>
-                        <strong>Fecha:</strong> {{ consulta.fecha_consulta|date:"d/m/Y H:i" }}<br>
-                        <strong>Diagnóstico:</strong> {{ consulta.diagnostico|default:"Sin diagnóstico" }}
-                    </div>
-                    <p class="text-danger">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        <strong>Atención:</strong> Esta acción no se puede deshacer y eliminará todos los tratamientos asociados.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form method="POST" action="{% url 'consultas_delete' consulta.pk %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash me-2"></i>
-                            Eliminar Consulta
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endfor %}
 {% endblock %}
 
-{% block extra_css %}
-<style>
-    .avatar-circle {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-    }
-    
-    .table td {
-        vertical-align: middle;
-    }
-    
-    .text-truncate {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
+{% block extra_js %}
+<script>
+function deleteConsulta(id, paciente, fecha) {
+    document.getElementById('consultaPaciente').textContent = paciente;
+    document.getElementById('consultaFecha').textContent = fecha;
+    document.getElementById('deleteForm').action = "{% url 'consultas_delete' 0 %}".replace('0', id);
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', function() {
+    document.getElementById('deleteModal').classList.add('hidden');
+});
+</script>
 {% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Cita Médica #{{ cita.id }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Editar Cita Médica #{{ cita.id }}{% endblock %}
+{% block page_description %}Modificar información de la cita médica{% endblock %}
+
+{% block page_actions %}
+<div class="flex space-x-2">
+    <a href="{% url 'citas_detail' cita.pk %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        Ver Detalles
+    </a>
+    <a href="{% url 'citas_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Volver a Lista
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-warning-600 to-orange-600">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Editar Información de la Cita
+            </h3>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Por favor corrija los siguientes errores:
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Paciente -->
+                <div>
+                    <label for="{{ form.paciente.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Paciente *
+                    </label>
+                    {{ form.paciente }}
+                    {% if form.paciente.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.paciente.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Médico -->
+                <div>
+                    <label for="{{ form.medico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Médico *
+                    </label>
+                    {{ form.medico }}
+                    {% if form.medico.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.medico.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Fecha y Hora -->
+                <div>
+                    <label for="{{ form.fecha_hora.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Fecha y Hora *
+                    </label>
+                    {{ form.fecha_hora }}
+                    {% if form.fecha_hora.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.fecha_hora.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Estado -->
+                <div>
+                    <label for="{{ form.estado.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Estado *
+                    </label>
+                    {{ form.estado }}
+                    {% if form.estado.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.estado.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Motivo -->
+            <div>
+                <label for="{{ form.motivo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Motivo de la Cita
+                </label>
+                {{ form.motivo }}
+                {% if form.motivo.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.motivo.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Observaciones -->
+            <div>
+                <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Observaciones
+                </label>
+                {{ form.observaciones }}
+                {% if form.observaciones.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.observaciones.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Información de Auditoría -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">Información de Auditoría</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div>
+                        <span class="font-medium">Creado:</span> {{ cita.fecha_creacion|date:"d/m/Y H:i" }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Última modificación:</span> {{ cita.fecha_actualizacion|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'citas_detail' cita.pk %}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 bg-warning-600 hover:bg-warning-700 text-white rounded-lg transition-colors duration-200 flex items-center shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today for future appointments only
+    const fechaHoraInput = document.getElementById('{{ form.fecha_hora.id_for_label }}');
+    if (fechaHoraInput) {
+        const now = new Date();
+        const citaFecha = new Date('{{ cita.fecha_hora|date:"Y-m-d H:i" }}');
+        
+        // Only set minimum date if the appointment is in the future
+        if (citaFecha > now) {
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            fechaHoraInput.min = minDateTime;
+        }
+    }
+});
+</script>
+{% endblock %}

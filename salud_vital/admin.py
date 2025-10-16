@@ -22,8 +22,8 @@ class MedicoAdmin(admin.ModelAdmin):
 
 @admin.register(Paciente)
 class PacienteAdmin(admin.ModelAdmin):
-    list_display = ['rut', 'nombre', 'apellido', 'fecha_nacimiento', 'telefono']
-    search_fields = ['rut', 'nombre', 'apellido']
+    list_display = ['rut', 'nombre', 'apellido', 'fecha_nacimiento', 'email', 'telefono']
+    search_fields = ['rut', 'nombre', 'apellido', 'email']
     list_filter = ['fecha_nacimiento', 'created_at']
     ordering = ['apellido', 'nombre']
 

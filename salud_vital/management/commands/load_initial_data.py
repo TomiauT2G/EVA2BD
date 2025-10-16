@@ -81,6 +81,7 @@ class Command(BaseCommand):
                     'nombre': 'Ana María',
                     'apellido': 'Fernández Castro',
                     'fecha_nacimiento': date(1985, 3, 15),
+                    'genero': 'F',
                     'telefono': '+56911111111',
                     'direccion': 'Av. Providencia 1234, Santiago',
                 },
@@ -89,6 +90,7 @@ class Command(BaseCommand):
                     'nombre': 'Carlos Eduardo',
                     'apellido': 'Morales Vega',
                     'fecha_nacimiento': date(1978, 7, 22),
+                    'genero': 'M',
                     'telefono': '+56922222222',
                     'direccion': 'Calle Las Condes 567, Las Condes',
                 },
@@ -97,6 +99,7 @@ class Command(BaseCommand):
                     'nombre': 'Sofía Isabel',
                     'apellido': 'Herrera Muñoz',
                     'fecha_nacimiento': date(2010, 12, 8),
+                    'genero': 'F',
                     'telefono': '+56933333333',
                     'direccion': 'Pasaje Los Álamos 890, Ñuñoa',
                 }

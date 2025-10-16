@@ -120,6 +120,26 @@
                                 </div>
                             {% endif %}
                         </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.activo.id_for_label }}" class="form-label">
+                                <i class="bi bi-toggle-on me-1"></i>
+                                Estado
+                            </label>
+                            <div class="form-check form-switch">
+                                {{ form.activo }}
+                                <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                    Médico activo
+                                </label>
+                            </div>
+                            {% if form.activo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.activo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                     
                     <div class="row">

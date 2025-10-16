@@ -6,77 +6,96 @@
 {% block page_description %}Modificar información del tratamiento médico{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'tratamientos_detail' tratamiento.id %}" class="btn btn-outline-info me-2">
-    <i class="bi bi-eye me-2"></i>
+<a href="{% url 'tratamientos_detail' tratamiento.id %}" class="inline-flex items-center px-4 py-2 border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors mr-2">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+    </svg>
     Ver Detalles
 </a>
-<a href="{% url 'tratamientos_list' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-2"></i>
+<a href="{% url 'tratamientos_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
     Volver a Lista
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-pencil-square me-2"></i>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
                     Editar Tratamiento: {{ tratamiento.nombre }}
                 </h5>
             </div>
             
-            <div class="card-body">
+            <div class="p-6">
                 <form method="POST" class="needs-validation" novalidate>
                     {% csrf_token %}
                     
-                    <!-- Consultation Information -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-primary border-bottom pb-2 mb-3">
-                                <i class="bi bi-clipboard-data me-2"></i>
-                                Información de la Consulta
-                            </h6>
-                        </div>
+                    <!-- Información de la Consulta -->
+                    <div class="mb-8">
+                        <h6 class="text-blue-600 text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h5.586a1 1 0 00.707-.293l5.414-5.414a1 1 0 00.293-.707V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            Información de la Consulta
+                        </h6>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.consulta.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar-check me-1"></i>
+                        <div class="mb-4">
+                            <label for="{{ form.consulta.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
                                 Consulta Médica *
                             </label>
                             {{ form.consulta }}
                             {% if form.consulta.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     {% for error in form.consulta.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
+                            <div class="mt-1 text-sm text-gray-500 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
                                 Consulta médica asociada a este tratamiento
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Treatment Details -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-success border-bottom pb-2 mb-3">
-                                <i class="bi bi-heart-pulse me-2"></i>
-                                Detalles del Tratamiento
-                            </h6>
-                        </div>
+                    <!-- Detalles del Tratamiento -->
+                    <div class="mb-8">
+                        <h6 class="text-green-600 text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            Detalles del Tratamiento
+                        </h6>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
-                                <i class="bi bi-tag me-1"></i>
+                        <div class="mb-4">
+                            <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
                                 Nombre del Tratamiento *
                             </label>
                             {{ form.nombre }}
                             {% if form.nombre.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     {% for error in form.nombre.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -84,14 +103,19 @@
                             {% endif %}
                         </div>
                         
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
-                                <i class="bi bi-journal-text me-1"></i>
+                        <div class="mb-4">
+                            <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
                                 Descripción del Tratamiento *
                             </label>
                             {{ form.descripcion }}
                             {% if form.descripcion.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     {% for error in form.descripcion.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -99,44 +123,61 @@
                             {% endif %}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.duracion_dias.id_for_label }}" class="form-label">
-                                <i class="bi bi-clock me-1"></i>
-                                Duración (días) *
-                            </label>
-                            {{ form.duracion_dias }}
-                            {% if form.duracion_dias.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.duracion_dias.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="{{ form.duracion_dias.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Duración (días) *
+                                </label>
+                                {{ form.duracion_dias }}
+                                {% if form.duracion_dias.errors %}
+                                    <div class="mt-1 text-sm text-red-600 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        {% for error in form.duracion_dias.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Fecha de Inicio
+                                </label>
+                                {{ form.fecha_inicio }}
+                                {% if form.fecha_inicio.errors %}
+                                    <div class="mt-1 text-sm text-red-600 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        {% for error in form.fecha_inicio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar-event me-1"></i>
-                                Fecha de Inicio
-                            </label>
-                            {{ form.fecha_inicio }}
-                            {% if form.fecha_inicio.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.fecha_inicio.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.instrucciones.id_for_label }}" class="form-label">
-                                <i class="bi bi-list-check me-1"></i>
+                        <div class="mb-4">
+                            <label for="{{ form.instrucciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h5.586a1 1 0 00.707-.293l5.414-5.414a1 1 0 00.293-.707V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
                                 Instrucciones Especiales
                             </label>
                             {{ form.instrucciones }}
                             {% if form.instrucciones.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="mt-1 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     {% for error in form.instrucciones.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -145,45 +186,51 @@
                         </div>
                     </div>
                     
-                    <!-- Status Information -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-warning border-bottom pb-2 mb-3">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Estado del Tratamiento
-                            </h6>
-                        </div>
+                    <!-- Estado del Tratamiento -->
+                    <div class="mb-8">
+                        <h6 class="text-yellow-600 text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Estado del Tratamiento
+                        </h6>
                         
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-calendar-plus me-1"></i>
-                                Fecha de Creación
-                            </label>
-                            <input type="text" class="form-control" value="{{ tratamiento.fecha_creacion|date:'d/m/Y H:i' }}" readonly>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-calendar-check me-1"></i>
-                                Última Actualización
-                            </label>
-                            <input type="text" class="form-control" value="{{ tratamiento.fecha_actualizacion|date:'d/m/Y H:i' }}" readonly>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                    Fecha de Creación
+                                </label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600" value="{{ tratamiento.fecha_creacion|date:'d/m/Y H:i' }}" readonly>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Última Actualización
+                                </label>
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600" value="{{ tratamiento.fecha_actualizacion|date:'d/m/Y H:i' }}" readonly>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
-                                    <i class="bi bi-x-circle me-2"></i>
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Guardar Cambios
-                                </button>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                        <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors" onclick="history.back()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Guardar Cambios
+                        </button>
                     </div>
                 </form>
             </div>
@@ -191,18 +238,23 @@
     </div>
     
     <!-- Preview Card -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-eye me-2"></i>
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
                     Vista Previa
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="text-center mb-3">
-                    <div class="avatar-circle bg-success text-white d-inline-flex align-items-center justify-content-center">
-                        <i class="bi bi-heart-pulse fs-3"></i>
+            <div class="p-6">
+                <div class="text-center mb-4">
+                    <div class="w-16 h-16 bg-green-600 text-white rounded-full inline-flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
                     </div>
                 </div>
                 
@@ -213,14 +265,16 @@
         </div>
         
         <!-- Progress Card -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-graph-up me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
                     Progreso del Tratamiento
                 </h6>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 <div id="progress-info">
                     <!-- Progress will be calculated by JavaScript -->
                 </div>
@@ -228,62 +282,61 @@
         </div>
         
         <!-- Duration Calculator -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-calculator me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
                     Calculadora de Duración
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(7)">
-                            1 Semana
-                        </button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(14)">
-                            2 Semanas
-                        </button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(30)">
-                            1 Mes
-                        </button>
-                    </div>
+            <div class="p-6">
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <button type="button" class="px-3 py-2 text-sm border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors" onclick="setDuration(7)">
+                        1 Semana
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors" onclick="setDuration(14)">
+                        2 Semanas
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors" onclick="setDuration(30)">
+                        1 Mes
+                    </button>
                 </div>
-                <div class="row text-center mt-2">
-                    <div class="col-6">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(60)">
-                            2 Meses
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(90)">
-                            3 Meses
-                        </button>
-                    </div>
+                <div class="grid grid-cols-2 gap-2 text-center mt-2">
+                    <button type="button" class="px-3 py-2 text-sm border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors" onclick="setDuration(60)">
+                        2 Meses
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors" onclick="setDuration(90)">
+                        3 Meses
+                    </button>
                 </div>
             </div>
         </div>
         
         <!-- Quick Actions -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-lightning me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
                     Acciones Rápidas
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'tratamientos_detail' tratamiento.id %}" class="btn btn-outline-info btn-sm">
-                        <i class="bi bi-eye me-2"></i>
+            <div class="p-6">
+                <div class="space-y-2">
+                    <a href="{% url 'tratamientos_detail' tratamiento.id %}" class="w-full inline-flex items-center justify-center px-4 py-2 border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
                         Ver Detalles Completos
                     </a>
-                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="duplicateTreatment()">
-                        <i class="bi bi-files me-2"></i>
+                    <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-yellow-300 text-yellow-700 bg-white rounded-lg hover:bg-yellow-50 transition-colors text-sm" onclick="duplicateTreatment()">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
                         Duplicar Tratamiento
                     </button>
                 </div>
@@ -295,20 +348,31 @@
 
 {% block extra_css %}
 <style>
-    .avatar-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+    /* Form validation styles */
+    .needs-validation input:invalid,
+    .needs-validation textarea:invalid,
+    .needs-validation select:invalid {
+        @apply border-red-500 focus:border-red-500 focus:ring-red-500;
     }
     
-    .needs-validation .form-control:invalid {
-        border-color: #dc3545;
+    .needs-validation input:valid,
+    .needs-validation textarea:valid,
+    .needs-validation select:valid {
+        @apply border-green-500 focus:border-green-500 focus:ring-green-500;
     }
     
-    .needs-validation .form-control:valid {
-        border-color: #198754;
+    /* Form inputs base styles */
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
     }
     
+    /* Progress bar animation */
     .progress-bar {
         transition: width 0.3s ease;
     }
@@ -327,6 +391,13 @@
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
+                
+                // Show validation errors with Tailwind styling
+                const invalidInputs = form.querySelectorAll(':invalid');
+                invalidInputs.forEach(input => {
+                    input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                    input.classList.remove('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
+                });
             }
             form.classList.add('was-validated');
         });
@@ -349,13 +420,13 @@
             }
             
             previewContent.innerHTML = `
-                <div class="text-start">
-                    <p class="mb-1"><strong>Tratamiento:</strong> ${nombre || 'Sin nombre'}</p>
-                    <p class="mb-1"><strong>Consulta:</strong> ${consultaText.substring(0, 50)}${consultaText.length > 50 ? '...' : ''}</p>
-                    <p class="mb-1"><strong>Duración:</strong> ${duracion || '0'} días</p>
-                    ${fechaInicio ? `<p class="mb-1"><strong>Inicio:</strong> ${new Date(fechaInicio).toLocaleDateString('es-ES')}</p>` : ''}
-                    ${fechaFin ? `<p class="mb-1"><strong>Fin estimada:</strong> ${fechaFin}</p>` : ''}
-                    ${descripcion ? `<p class="mb-1"><strong>Descripción:</strong> ${descripcion.substring(0, 50)}${descripcion.length > 50 ? '...' : ''}</p>` : ''}
+                <div class="text-left">
+                    <p class="mb-2"><strong class="text-gray-700">Tratamiento:</strong> <span class="text-gray-900">${nombre || 'Sin nombre'}</span></p>
+                    <p class="mb-2"><strong class="text-gray-700">Consulta:</strong> <span class="text-gray-900">${consultaText.substring(0, 50)}${consultaText.length > 50 ? '...' : ''}</span></p>
+                    <p class="mb-2"><strong class="text-gray-700">Duración:</strong> <span class="text-gray-900">${duracion || '0'} días</span></p>
+                    ${fechaInicio ? `<p class="mb-2"><strong class="text-gray-700">Inicio:</strong> <span class="text-gray-900">${new Date(fechaInicio).toLocaleDateString('es-ES')}</span></p>` : ''}
+                    ${fechaFin ? `<p class="mb-2"><strong class="text-gray-700">Fin estimada:</strong> <span class="text-gray-900">${fechaFin}</span></p>` : ''}
+                    ${descripcion ? `<p class="mb-2"><strong class="text-gray-700">Descripción:</strong> <span class="text-gray-900">${descripcion.substring(0, 50)}${descripcion.length > 50 ? '...' : ''}</span></p>` : ''}
                 </div>
             `;
             
@@ -379,51 +450,47 @@
                 
                 if (hoy < inicio) {
                     statusText = 'No iniciado';
-                    statusClass = 'text-secondary';
+                    statusClass = 'text-gray-500';
                     progressPercentage = 0;
                 } else if (hoy > fin) {
                     statusText = 'Completado';
-                    statusClass = 'text-success';
+                    statusClass = 'text-green-600';
                     progressPercentage = 100;
                 } else {
                     const totalDias = (fin - inicio) / (1000 * 60 * 60 * 24);
                     const diasTranscurridos = (hoy - inicio) / (1000 * 60 * 60 * 24);
                     progressPercentage = Math.round((diasTranscurridos / totalDias) * 100);
                     statusText = 'En progreso';
-                    statusClass = 'text-primary';
+                    statusClass = 'text-blue-600';
                 }
                 
                 progressInfo.innerHTML = `
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="text-muted">Progreso</small>
-                            <small class="${statusClass}">${statusText}</small>
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-500">Progreso</span>
+                            <span class="text-sm font-medium ${statusClass}">${statusText}</span>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full transition-all duration-300 ${progressPercentage < 30 ? 'bg-red-500' : progressPercentage < 70 ? 'bg-yellow-500' : 'bg-green-500'}" style="width: ${progressPercentage}%"></div>
                         </div>
-                        <div class="d-flex justify-content-between mt-1">
-                            <small class="text-muted">${progressPercentage}% completado</small>
-                            <small class="text-muted">${duracion} días total</small>
+                        <div class="flex justify-between mt-2">
+                            <span class="text-sm text-gray-500">${progressPercentage}% completado</span>
+                            <span class="text-sm text-gray-500">${duracion} días total</span>
                         </div>
                     </div>
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="border rounded p-2">
-                                <div class="text-primary fw-bold">${inicio.toLocaleDateString('es-ES')}</div>
-                                <small class="text-muted">Inicio</small>
-                            </div>
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <div class="text-blue-600 font-semibold">${inicio.toLocaleDateString('es-ES')}</div>
+                            <div class="text-sm text-gray-500">Inicio</div>
                         </div>
-                        <div class="col-6">
-                            <div class="border rounded p-2">
-                                <div class="text-success fw-bold">${fin.toLocaleDateString('es-ES')}</div>
-                                <small class="text-muted">Fin</small>
-                            </div>
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <div class="text-green-600 font-semibold">${fin.toLocaleDateString('es-ES')}</div>
+                            <div class="text-sm text-gray-500">Fin</div>
                         </div>
                     </div>
                 `;
             } else {
-                progressInfo.innerHTML = '<p class="text-muted text-center">Complete las fechas para ver el progreso</p>';
+                progressInfo.innerHTML = '<p class="text-gray-500 text-center">Complete las fechas para ver el progreso</p>';
             }
         }
         

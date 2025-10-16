@@ -6,217 +6,269 @@
 {% block page_description %}Detalles de la prescripción médica{% endblock %}
 
 {% block page_actions %}
-<div class="btn-group">
-    <a href="{% url 'recetas_edit' receta.id %}" class="btn btn-warning">
-        <i class="bi bi-pencil me-2"></i>Editar
+<div class="flex flex-wrap gap-3">
+    <a href="{% url 'recetas_edit' receta.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Editar
     </a>
-    <button type="button" class="btn btn-info" onclick="printReceta()">
-        <i class="bi bi-printer me-2"></i>Imprimir
+    <button type="button" onclick="printReceta()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Imprimir
     </button>
-    <a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+    <a href="{% url 'recetas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Volver a la lista
     </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
         <!-- Información principal de la receta -->
-        <div class="card mb-4" id="receta-content">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-prescription2 me-2"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6" id="receta-content">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h5 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         Receta Médica #{{ receta.id }}
                     </h5>
-                    <div class="d-flex gap-2">
+                    <div class="flex gap-2">
                         {% if receta.fecha_vencimiento >= today %}
-                            <span class="badge bg-success fs-6">
-                                <i class="bi bi-check-circle me-1"></i>Vigente
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Vigente
                             </span>
                         {% else %}
-                            <span class="badge bg-danger fs-6">
-                                <i class="bi bi-x-circle me-1"></i>Vencida
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Vencida
                             </span>
                         {% endif %}
                         
                         {% if receta.fecha_vencimiento <= warning_date and receta.fecha_vencimiento >= today %}
-                            <span class="badge bg-warning fs-6">
-                                <i class="bi bi-clock me-1"></i>Por vencer
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Por vencer
                             </span>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 <!-- Información del paciente y médico -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-primary mb-3">
-                                <i class="bi bi-person me-2"></i>Información del Paciente
-                            </h6>
-                            <div class="patient-info">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
-                                        <i class="bi bi-person text-white fs-4"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-0">{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</h5>
-                                        <p class="text-muted mb-0">RUT: {{ receta.consulta.paciente.rut }}</p>
-                                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-5">
+                        <h6 class="text-blue-600 font-semibold mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Información del Paciente
+                        </h6>
+                        <div class="patient-info">
+                            <div class="flex items-center mb-4">
+                                <div class="w-15 h-15 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
                                 </div>
-                                <div class="patient-details">
-                                    <p><strong>Fecha de Nacimiento:</strong> {{ receta.consulta.paciente.fecha_nacimiento|date:"d/m/Y" }}</p>
-                                    <p><strong>Teléfono:</strong> {{ receta.consulta.paciente.telefono }}</p>
-                                    <p><strong>Email:</strong> {{ receta.consulta.paciente.email }}</p>
+                                <div>
+                                    <h5 class="text-lg font-semibold text-gray-900">{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</h5>
+                                    <p class="text-gray-500">RUT: {{ receta.consulta.paciente.rut }}</p>
                                 </div>
+                            </div>
+                            <div class="space-y-2 text-sm">
+                                <p><span class="font-medium text-gray-700">Fecha de Nacimiento:</span> {{ receta.consulta.paciente.fecha_nacimiento|date:"d/m/Y" }}</p>
+                                <p><span class="font-medium text-gray-700">Teléfono:</span> {{ receta.consulta.paciente.telefono }}</p>
+                                <p><span class="font-medium text-gray-700">Email:</span> {{ receta.consulta.paciente.email }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-success mb-3">
-                                <i class="bi bi-person-badge me-2"></i>Médico Prescriptor
-                            </h6>
-                            <div class="doctor-info">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="avatar-lg bg-success rounded-circle d-flex align-items-center justify-content-center me-3">
-                                        <i class="bi bi-person-badge text-white fs-4"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-0">Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</h5>
-                                        <p class="text-muted mb-0">{{ receta.consulta.medico.especialidad.nombre }}</p>
-                                    </div>
+                    <div class="bg-gray-50 rounded-lg p-5">
+                        <h6 class="text-green-600 font-semibold mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            Médico Prescriptor
+                        </h6>
+                        <div class="doctor-info">
+                            <div class="flex items-center mb-4">
+                                <div class="w-15 h-15 bg-green-600 rounded-full flex items-center justify-center mr-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
                                 </div>
-                                <div class="doctor-details">
-                                    <p><strong>Registro Médico:</strong> {{ receta.consulta.medico.numero_registro }}</p>
-                                    <p><strong>Teléfono:</strong> {{ receta.consulta.medico.telefono }}</p>
-                                    <p><strong>Email:</strong> {{ receta.consulta.medico.email }}</p>
+                                <div>
+                                    <h5 class="text-lg font-semibold text-gray-900">Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</h5>
+                                    <p class="text-gray-500">{{ receta.consulta.medico.especialidad.nombre }}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-sm">
+                                <p><span class="font-medium text-gray-700">Registro Médico:</span> {{ receta.consulta.medico.numero_registro }}</p>
+                                <p><span class="font-medium text-gray-700">Teléfono:</span> {{ receta.consulta.medico.telefono }}</p>
+                                <p><span class="font-medium text-gray-700">Email:</span> {{ receta.consulta.medico.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la consulta asociada -->
+                <div class="mb-6">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                            <h6 class="text-cyan-600 font-semibold flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                                Consulta Asociada
+                            </h6>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3">
+                                    <p><span class="font-medium text-gray-700">Fecha de Consulta:</span> <span class="text-gray-900">{{ receta.consulta.fecha|date:"d/m/Y H:i" }}</span></p>
+                                    <p><span class="font-medium text-gray-700">Motivo:</span> <span class="text-gray-900">{{ receta.consulta.motivo }}</span></p>
+                                </div>
+                                <div class="space-y-3">
+                                    <p><span class="font-medium text-gray-700">Diagnóstico:</span> <span class="text-gray-900">{{ receta.consulta.diagnostico }}</span></p>
+                                    <p><span class="font-medium text-gray-700">Observaciones:</span> <span class="text-gray-900">{{ receta.consulta.observaciones|default:"Sin observaciones" }}</span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Información de la consulta -->
-                <div class="alert alert-info mb-4">
-                    <h6><i class="bi bi-calendar-check me-2"></i>Información de la Consulta</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Fecha de Consulta:</strong> {{ receta.consulta.fecha|date:"d/m/Y H:i" }}</p>
-                            <p><strong>Motivo:</strong> {{ receta.consulta.motivo }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Diagnóstico:</strong> {{ receta.consulta.diagnostico }}</p>
-                            <p><strong>Observaciones:</strong> {{ receta.consulta.observaciones|default:"Sin observaciones" }}</p>
-                        </div>
+                <!-- Fechas importantes -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <h6 class="font-semibold text-gray-900 mb-1">Fecha de Prescripción</h6>
+                        <p class="text-gray-600 font-bold">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
                     </div>
-                </div>
-
-                <!-- Fechas de la receta -->
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="date-card text-center p-3 bg-light rounded">
-                            <i class="bi bi-calendar-plus text-primary fs-2 d-block mb-2"></i>
-                            <h6 class="mb-1">Fecha de Prescripción</h6>
-                            <p class="mb-0 fw-bold">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
-                        </div>
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <svg class="w-12 h-12 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h6 class="font-semibold text-gray-900 mb-1">Fecha de Vencimiento</h6>
+                        <p class="text-gray-600 font-bold">{{ receta.fecha_vencimiento|date:"d/m/Y" }}</p>
                     </div>
-                    <div class="col-md-4">
-                        <div class="date-card text-center p-3 bg-light rounded">
-                            <i class="bi bi-calendar-x text-warning fs-2 d-block mb-2"></i>
-                            <h6 class="mb-1">Fecha de Vencimiento</h6>
-                            <p class="mb-0 fw-bold">{{ receta.fecha_vencimiento|date:"d/m/Y" }}</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="date-card text-center p-3 bg-light rounded">
-                            <i class="bi bi-clock text-info fs-2 d-block mb-2"></i>
-                            <h6 class="mb-1">Días Restantes</h6>
-                            <p class="mb-0 fw-bold">
-                                {% if receta.fecha_vencimiento >= today %}
-                                    {{ days_remaining }} días
-                                {% else %}
-                                    <span class="text-danger">Vencida</span>
-                                {% endif %}
-                            </p>
-                        </div>
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+                        <svg class="w-12 h-12 text-cyan-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h6 class="font-semibold text-gray-900 mb-1">Días Restantes</h6>
+                        <p class="text-gray-600 font-bold">
+                            {% if receta.fecha_vencimiento >= today %}
+                                {{ days_remaining }} días
+                            {% else %}
+                                <span class="text-red-600">Vencida</span>
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
 
                 <!-- Medicamentos prescritos -->
-                <div class="mb-4">
-                    <h6 class="text-primary mb-3">
-                        <i class="bi bi-capsule me-2"></i>Medicamentos Prescritos
-                    </h6>
-                    
-                    {% for detalle in receta.detalles.all %}
-                    <div class="card mb-3 medicamento-card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="d-flex align-items-start">
-                                        <div class="medicamento-icon me-3">
-                                            <div class="bg-secondary rounded-circle p-2">
-                                                <i class="bi bi-capsule text-white"></i>
+                <div class="mb-6">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                            <h5 class="text-gray-900 font-semibold flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                                Medicamentos Prescritos
+                            </h5>
+                        </div>
+                        <div class="p-6">
+                            {% for detalle in receta.detalles.all %}
+                            <div class="border border-gray-200 rounded-lg p-4 mb-4 last:mb-0 bg-gray-50">
+                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div class="lg:col-span-2">
+                                        <div class="flex items-start">
+                                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                                </svg>
                                             </div>
-                                        </div>
-                                        <div class="medicamento-info">
-                                            <h6 class="mb-1">{{ detalle.medicamento.nombre_comercial }}</h6>
-                                            <p class="text-muted mb-2">{{ detalle.medicamento.principio_activo }} - {{ detalle.medicamento.concentracion }}</p>
-                                            <div class="medicamento-details">
-                                                <span class="badge bg-light text-dark me-2">{{ detalle.medicamento.tipo }}</span>
-                                                <span class="badge bg-light text-dark me-2">{{ detalle.medicamento.laboratorio }}</span>
-                                                {% if detalle.medicamento.requiere_receta %}
-                                                    <span class="badge bg-warning">Requiere Receta</span>
-                                                {% endif %}
+                                            <div class="flex-1">
+                                                <h6 class="text-blue-600 font-semibold text-lg mb-2">{{ detalle.medicamento.nombre_comercial }}</h6>
+                                                <p class="text-gray-600 mb-3">{{ detalle.medicamento.principio_activo }} - {{ detalle.medicamento.concentracion }}</p>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ detalle.medicamento.tipo }}</span>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ detalle.medicamento.laboratorio }}</span>
+                                                    {% if detalle.medicamento.requiere_receta %}
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Requiere Receta</span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="prescription-details">
-                                        <div class="detail-item mb-2">
-                                            <strong>Dosis:</strong> {{ detalle.dosis }}
+                                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                        <h6 class="text-green-600 font-semibold mb-3 flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Indicaciones
+                                        </h6>
+                                        <div class="space-y-2 text-sm">
+                                            <p><span class="font-medium text-gray-700">Dosis:</span> <span class="text-gray-900">{{ detalle.dosis }}</span></p>
+                                            <p><span class="font-medium text-gray-700">Frecuencia:</span> <span class="text-gray-900">{{ detalle.frecuencia }}</span></p>
+                                            {% if detalle.duracion %}
+                                            <p><span class="font-medium text-gray-700">Duración:</span> <span class="text-gray-900">{{ detalle.duracion }}</span></p>
+                                            {% endif %}
                                         </div>
-                                        <div class="detail-item mb-2">
-                                            <strong>Frecuencia:</strong> {{ detalle.frecuencia }}
-                                        </div>
-                                        {% if detalle.duracion %}
-                                        <div class="detail-item mb-2">
-                                            <strong>Duración:</strong> {{ detalle.duracion }}
-                                        </div>
-                                        {% endif %}
                                     </div>
                                 </div>
+                                
+                                {% if detalle.instrucciones %}
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <p class="font-medium text-gray-700 mb-2">Instrucciones Especiales:</p>
+                                    <p class="text-gray-600 text-sm">{{ detalle.instrucciones }}</p>
+                                </div>
+                                {% endif %}
                             </div>
-                            
-                            {% if detalle.instrucciones %}
-                            <div class="mt-3 pt-3 border-top">
-                                <strong>Instrucciones Especiales:</strong>
-                                <p class="mb-0 text-muted">{{ detalle.instrucciones }}</p>
+                            {% empty %}
+                            <div class="text-center py-8">
+                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                                <p class="text-gray-500">No hay medicamentos prescritos en esta receta</p>
                             </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% empty %}
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-capsule fs-1 d-block mb-2"></i>
-                        <p>No hay medicamentos prescritos en esta receta</p>
-                    </div>
-                    {% endfor %}
                 </div>
 
                 <!-- Observaciones generales -->
                 {% if receta.observaciones %}
-                <div class="mb-4">
-                    <h6 class="text-primary mb-3">
-                        <i class="bi bi-chat-text me-2"></i>Observaciones Generales
-                    </h6>
-                    <div class="alert alert-light">
-                        <p class="mb-0">{{ receta.observaciones }}</p>
+                <div class="mb-6">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                            <h6 class="text-gray-900 font-semibold flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                Observaciones Generales
+                            </h6>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 leading-relaxed">{{ receta.observaciones }}</p>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -224,140 +276,174 @@
         </div>
     </div>
     
-    <div class="col-lg-4">
+    <div class="space-y-6">
         <!-- Acciones rápidas -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-lightning me-2"></i>Acciones Rápidas
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                <h6 class="text-gray-900 font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Acciones Rápidas
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'recetas_edit' receta.id %}" class="btn btn-warning">
-                        <i class="bi bi-pencil me-2"></i>Editar Receta
+            <div class="p-6">
+                <div class="space-y-3">
+                    <a href="{% url 'recetas_edit' receta.id %}" class="w-full flex items-center justify-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar Receta
                     </a>
-                    <button type="button" class="btn btn-info" onclick="printReceta()">
-                        <i class="bi bi-printer me-2"></i>Imprimir Receta
+                    <button onclick="printReceta()" class="w-full flex items-center justify-center px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                        Imprimir Receta
                     </button>
-                    <button type="button" class="btn btn-success" onclick="sendEmail()">
-                        <i class="bi bi-envelope me-2"></i>Enviar por Email
+                    <button onclick="sendEmail()" class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Enviar por Email
                     </button>
-                    <a href="{% url 'consultas_detail' receta.consulta.id %}" class="btn btn-outline-primary">
-                        <i class="bi bi-calendar-check me-2"></i>Ver Consulta
+                    <a href="{% url 'consultas_detail' receta.consulta.id %}" class="w-full flex items-center justify-center px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Ver Consulta
                     </a>
                 </div>
             </div>
         </div>
         
         <!-- Estado de la receta -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-info-circle me-2"></i>Estado de la Receta
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                <h6 class="text-gray-900 font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Estado de la Receta
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="status-timeline">
-                    <div class="status-item {% if receta.fecha_prescripcion %}completed{% endif %}">
-                        <div class="status-icon bg-success">
-                            <i class="bi bi-check"></i>
-                        </div>
-                        <div class="status-content">
-                            <h6>Receta Creada</h6>
-                            <small class="text-muted">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</small>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="w-4 h-4 bg-green-500 rounded-full mt-1 mr-4 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <h6 class="font-semibold text-gray-900">Receta Creada</h6>
+                            <p class="text-gray-600 text-sm">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
                         </div>
                     </div>
-                    
-                    <div class="status-item {% if receta.fecha_vencimiento >= today %}active{% else %}expired{% endif %}">
-                        <div class="status-icon {% if receta.fecha_vencimiento >= today %}bg-primary{% else %}bg-danger{% endif %}">
-                            <i class="bi bi-{% if receta.fecha_vencimiento >= today %}clock{% else %}x{% endif %}"></i>
-                        </div>
-                        <div class="status-content">
-                            <h6>{% if receta.fecha_vencimiento >= today %}Vigente{% else %}Vencida{% endif %}</h6>
-                            <small class="text-muted">Hasta {{ receta.fecha_vencimiento|date:"d/m/Y" }}</small>
+                    <div class="flex items-start">
+                        <div class="w-4 h-4 {% if receta.fecha_vencimiento >= today %}bg-blue-500{% else %}bg-red-500{% endif %} rounded-full mt-1 mr-4 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <h6 class="font-semibold text-gray-900">{% if receta.fecha_vencimiento >= today %}Vigente{% else %}Vencida{% endif %}</h6>
+                            <p class="text-gray-600 text-sm">Hasta {{ receta.fecha_vencimiento|date:"d/m/Y" }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Información adicional -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-graph-up me-2"></i>Estadísticas
+        <!-- Estadísticas -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                <h6 class="text-gray-900 font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Estadísticas
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="stat-item mb-3">
-                    <div class="d-flex justify-content-between">
-                        <span>Total Medicamentos:</span>
-                        <strong>{{ receta.detalles.count }}</strong>
+            <div class="p-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700">Total Medicamentos:</span>
+                        <span class="font-semibold text-gray-900">{{ receta.detalles.count }}</span>
                     </div>
-                </div>
-                <div class="stat-item mb-3">
-                    <div class="d-flex justify-content-between">
-                        <span>Con Receta Requerida:</span>
-                        <strong>{{ medicamentos_con_receta }}</strong>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700">Con Receta Requerida:</span>
+                        <span class="font-semibold text-gray-900">{{ medicamentos_con_receta }}</span>
                     </div>
-                </div>
-                <div class="stat-item mb-3">
-                    <div class="d-flex justify-content-between">
-                        <span>Días de Validez:</span>
-                        <strong>{{ total_validity_days }}</strong>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700">Días de Validez:</span>
+                        <span class="font-semibold text-gray-900">{{ total_validity_days }}</span>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Historial del paciente -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-clock-history me-2"></i>Historial del Paciente
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+                <h6 class="text-gray-900 font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Historial del Paciente
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="small">
-                    <p><strong>Recetas anteriores:</strong> {{ recetas_anteriores }}</p>
-                    <p><strong>Última consulta:</strong> {{ ultima_consulta|date:"d/m/Y" }}</p>
-                    <p><strong>Próxima cita:</strong> {{ proxima_cita|date:"d/m/Y"|default:"No programada" }}</p>
+            <div class="p-6">
+                <div class="space-y-3 text-sm">
+                    <p><span class="font-medium text-gray-700">Recetas anteriores:</span> <span class="text-gray-900">{{ recetas_anteriores }}</span></p>
+                    <p><span class="font-medium text-gray-700">Última consulta:</span> <span class="text-gray-900">{{ ultima_consulta|date:"d/m/Y" }}</span></p>
+                    <p><span class="font-medium text-gray-700">Próxima cita:</span> <span class="text-gray-900">{{ proxima_cita|date:"d/m/Y"|default:"No programada" }}</span></p>
                 </div>
-                <a href="{% url 'pacientes_detail' receta.consulta.paciente.id %}" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-person me-1"></i>Ver Perfil Completo
-                </a>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <a href="{% url 'pacientes_detail' receta.consulta.paciente.id %}" class="w-full flex items-center justify-center px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Ver Perfil Completo
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal de confirmación para envío de email -->
-<div class="modal fade" id="emailModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Enviar Receta por Email</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="emailForm">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email del paciente</label>
-                        <input type="email" class="form-control" id="email" value="{{ receta.consulta.paciente.email }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="mensaje" class="form-label">Mensaje adicional (opcional)</label>
-                        <textarea class="form-control" id="mensaje" rows="3" placeholder="Mensaje personalizado para el paciente..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="confirmSendEmail()">
-                    <i class="bi bi-envelope me-2"></i>Enviar
-                </button>
-            </div>
+<div id="emailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="flex items-center justify-between mb-4">
+            <h5 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Enviar Receta por Email
+            </h5>
+            <button onclick="closeEmailModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="mb-6">
+            <form id="emailForm">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email del paciente</label>
+                    <input type="email" id="email" value="{{ receta.consulta.paciente.email }}" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-2">Mensaje adicional (opcional)</label>
+                    <textarea id="mensaje" rows="3" placeholder="Mensaje personalizado para el paciente..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="flex justify-end space-x-3">
+            <button onclick="closeEmailModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Cancelar
+            </button>
+            <button onclick="confirmSendEmail()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Enviar
+            </button>
         </div>
     </div>
 </div>
@@ -365,116 +451,17 @@
 
 {% block extra_css %}
 <style>
-    .avatar-lg {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
-    }
-    
-    .info-section {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-        height: 100%;
-    }
-    
-    .date-card {
-        transition: transform 0.2s ease;
-    }
-    
-    .date-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    .medicamento-card {
-        border-left: 4px solid var(--secondary-color);
-        transition: box-shadow 0.2s ease;
-    }
-    
-    .medicamento-card:hover {
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    .medicamento-icon {
-        flex-shrink: 0;
-    }
-    
-    .prescription-details {
-        background-color: #f8f9fa;
-        border-radius: 6px;
-        padding: 15px;
-    }
-    
-    .detail-item {
-        font-size: 0.9rem;
-    }
-    
-    .status-timeline {
-        position: relative;
-    }
-    
-    .status-item {
-        display: flex;
-        align-items-center;
-        margin-bottom: 20px;
-        position: relative;
-    }
-    
-    .status-item:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: 40px;
-        width: 2px;
-        height: 20px;
-        background-color: #dee2e6;
-    }
-    
-    .status-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-        color: white;
-        font-size: 16px;
-    }
-    
-    .status-content h6 {
-        margin-bottom: 2px;
-        font-size: 0.9rem;
-    }
-    
-    .stat-item {
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .stat-item:last-child {
-        border-bottom: none;
-    }
-    
     @media print {
-        .btn, .card-header, .sidebar, .page-actions {
+        .no-print {
+            display: none !important;
+        }
+        
+        .sidebar {
             display: none !important;
         }
         
         .main-content {
             margin-left: 0 !important;
-        }
-        
-        .card {
-            border: none !important;
-            box-shadow: none !important;
-        }
-        
-        .col-lg-4 {
-            display: none !important;
-        }
-        
-        .col-lg-8 {
             width: 100% !important;
         }
     }
@@ -488,8 +475,11 @@
     }
     
     function sendEmail() {
-        const modal = new bootstrap.Modal(document.getElementById('emailModal'));
-        modal.show();
+        document.getElementById('emailModal').classList.remove('hidden');
+    }
+    
+    function closeEmailModal() {
+        document.getElementById('emailModal').classList.add('hidden');
     }
     
     function confirmSendEmail() {
@@ -505,8 +495,7 @@
         // Por ahora solo mostramos un mensaje de confirmación
         alert('Receta enviada por email a: ' + email);
         
-        const modal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
-        modal.hide();
+        closeEmailModal();
     }
     
     // Actualizar estado de vencimiento en tiempo real
@@ -516,15 +505,28 @@
         
         if (expirationDate < today) {
             // Actualizar badges y estados si la receta ha vencido
-            const badges = document.querySelectorAll('.badge');
+            const badges = document.querySelectorAll('.bg-green-100');
             badges.forEach(badge => {
                 if (badge.textContent.includes('Vigente')) {
-                    badge.className = 'badge bg-danger fs-6';
-                    badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Vencida';
+                    badge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
+                    badge.innerHTML = `
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        Vencida
+                    `;
                 }
             });
         }
     }
+    
+    // Cerrar modal al hacer clic fuera de él
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('emailModal');
+        if (event.target === modal) {
+            closeEmailModal();
+        }
+    });
     
     // Verificar estado cada minuto
     setInterval(updateExpirationStatus, 60000);

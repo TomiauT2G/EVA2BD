@@ -140,5 +140,5 @@ class PacienteDetalleSerializer(PacienteSerializer):
         pass
     
     def get_consultas_recientes(self, obj):
-        consultas = obj.consultamedica_set.all()[:5]
+        consultas = obj.consultas.all()[:5]
         return ConsultaMedicaSerializer(consultas, many=True).data

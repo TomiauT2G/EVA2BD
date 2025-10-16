@@ -6,40 +6,54 @@
 {% block page_description %}Modificar prescripción médica existente{% endblock %}
 
 {% block page_actions %}
-<div class="btn-group">
-    <a href="{% url 'recetas_detail' receta.id %}" class="btn btn-outline-info">
-        <i class="bi bi-eye me-2"></i>Ver Detalles
+<div class="flex space-x-3">
+    <a href="{% url 'recetas_detail' receta.id %}" class="inline-flex items-center px-4 py-2 border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        Ver Detalles
     </a>
-    <a href="{% url 'recetas_list' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+    <a href="{% url 'recetas_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Volver a la lista
     </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-prescription2 me-2"></i>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h5 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         Editar Receta Médica
                     </h5>
-                    <div class="badge bg-{{ receta.fecha_vencimiento >= today|date:'Y-m-d' and 'success' or 'danger' }}">
+                    <div class="px-3 py-1 rounded-full text-sm font-medium {% if receta.fecha_vencimiento >= today|date:'Y-m-d' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
                         {{ receta.fecha_vencimiento >= today|date:'Y-m-d' and 'Vigente' or 'Vencida' }}
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <form method="POST" class="needs-validation" novalidate>
+            <div class="p-6">
+                <form method="POST" id="receta-form" class="space-y-6" novalidate>
                     {% csrf_token %}
                     
                     <!-- Información básica -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="consulta" class="form-label">Consulta Médica *</label>
-                            <select class="form-select" id="consulta" name="consulta" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="consulta" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                Consulta Médica *
+                            </label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" id="consulta" name="consulta" required>
                                 <option value="">Seleccionar consulta...</option>
                                 {% for consulta in consultas %}
                                     <option value="{{ consulta.id }}" 
@@ -52,113 +66,142 @@
                                     </option>
                                 {% endfor %}
                             </select>
-                            <div class="invalid-feedback">
+                            <p class="text-red-600 text-sm mt-1 hidden">
+                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
                                 Por favor seleccione una consulta médica.
-                            </div>
+                            </p>
                         </div>
-                        <div class="col-md-6">
-                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento *</label>
-                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" 
+                        <div>
+                            <label for="fecha_vencimiento" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Fecha de Vencimiento *
+                            </label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" id="fecha_vencimiento" name="fecha_vencimiento" 
                                    value="{{ receta.fecha_vencimiento|date:'Y-m-d' }}" required>
-                            <div class="invalid-feedback">
+                            <p class="text-red-600 text-sm mt-1 hidden">
+                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
                                 Por favor ingrese la fecha de vencimiento.
-                            </div>
+                            </p>
                             {% if receta.fecha_vencimiento < today %}
-                                <small class="form-text text-danger">
-                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                <p class="text-red-600 text-sm mt-1 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
                                     Esta receta está vencida
-                                </small>
+                                </p>
                             {% elif receta.fecha_vencimiento <= warning_date %}
-                                <small class="form-text text-warning">
-                                    <i class="bi bi-clock me-1"></i>
+                                <p class="text-yellow-600 text-sm mt-1 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     Esta receta vence pronto
-                                </small>
+                                </p>
                             {% endif %}
                         </div>
                     </div>
 
                     <!-- Información de la consulta -->
-                    <div class="alert alert-info mb-4">
-                        <h6><i class="bi bi-info-circle me-2"></i>Información de la Consulta</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}<br>
-                                <strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h6 class="text-lg font-semibold text-blue-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Información de la Consulta
+                        </h6>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="space-y-2">
+                                <p><span class="font-semibold text-gray-700">Paciente:</span> <span class="text-gray-900">{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Médico:</span> <span class="text-gray-900">Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</span></p>
                             </div>
-                            <div class="col-md-6">
-                                <strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}<br>
-                                <strong>Diagnóstico:</strong> {{ receta.consulta.diagnostico }}
+                            <div class="space-y-2">
+                                <p><span class="font-semibold text-gray-700">Fecha:</span> <span class="text-gray-900">{{ receta.consulta.fecha|date:"d/m/Y" }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Diagnóstico:</span> <span class="text-gray-900">{{ receta.consulta.diagnostico }}</span></p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Medicamentos existentes -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Medicamentos Prescritos</h6>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMedicamento()">
-                                <i class="bi bi-plus-circle me-1"></i>Agregar Medicamento
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h6 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                                Medicamentos Prescritos
+                            </h6>
+                            <button type="button" class="inline-flex items-center px-3 py-2 border border-blue-300 text-blue-700 bg-white rounded-lg hover:bg-blue-50 transition-colors text-sm" onclick="addMedicamento()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Agregar Medicamento
                             </button>
                         </div>
                         
-                        <div id="medicamentos-container">
+                        <div id="medicamentos-container" class="space-y-4">
                             {% for detalle in receta.detalles.all %}
-                            <div class="card mb-3 medicamento-item">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <h6 class="card-title mb-0">Medicamento <span class="medicamento-number">{{ forloop.counter }}</span></h6>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
+                            <div class="bg-white border border-gray-200 rounded-lg p-4 medicamento-item border-l-4 border-l-blue-500">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h6 class="text-lg font-medium text-gray-900">Medicamento <span class="medicamento-number">{{ forloop.counter }}</span></h6>
+                                    <button type="button" class="inline-flex items-center px-2 py-1 border border-red-300 text-red-700 bg-white rounded hover:bg-red-50 transition-colors text-sm" onclick="removeMedicamento(this)">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                     
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Medicamento *</label>
-                                            <select class="form-select medicamento-select" name="medicamento[]" required>
-                                                <option value="">Seleccionar medicamento...</option>
-                                                {% for medicamento in medicamentos %}
-                                                    <option value="{{ medicamento.id }}" 
-                                                            {% if medicamento.id == detalle.medicamento.id %}selected{% endif %}
-                                                            data-nombre="{{ medicamento.nombre_comercial }}"
-                                                            data-principio="{{ medicamento.principio_activo }}"
-                                                            data-concentracion="{{ medicamento.concentracion }}"
-                                                            data-tipo="{{ medicamento.tipo }}">
-                                                        {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Dosis *</label>
-                                            <input type="text" class="form-control" name="dosis[]" 
-                                                   value="{{ detalle.dosis }}" placeholder="ej: 500mg, 1 comprimido" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Frecuencia *</label>
-                                            <select class="form-select" name="frecuencia[]" required>
-                                                <option value="">Seleccionar frecuencia...</option>
-                                                <option value="Cada 4 horas" {% if detalle.frecuencia == "Cada 4 horas" %}selected{% endif %}>Cada 4 horas</option>
-                                                <option value="Cada 6 horas" {% if detalle.frecuencia == "Cada 6 horas" %}selected{% endif %}>Cada 6 horas</option>
-                                                <option value="Cada 8 horas" {% if detalle.frecuencia == "Cada 8 horas" %}selected{% endif %}>Cada 8 horas</option>
-                                                <option value="Cada 12 horas" {% if detalle.frecuencia == "Cada 12 horas" %}selected{% endif %}>Cada 12 horas</option>
-                                                <option value="Una vez al día" {% if detalle.frecuencia == "Una vez al día" %}selected{% endif %}>Una vez al día</option>
-                                                <option value="Dos veces al día" {% if detalle.frecuencia == "Dos veces al día" %}selected{% endif %}>Dos veces al día</option>
-                                                <option value="Tres veces al día" {% if detalle.frecuencia == "Tres veces al día" %}selected{% endif %}>Tres veces al día</option>
-                                                <option value="Según necesidad" {% if detalle.frecuencia == "Según necesidad" %}selected{% endif %}>Según necesidad</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Duración</label>
-                                            <input type="text" class="form-control" name="duracion[]" 
-                                                   value="{{ detalle.duracion }}" placeholder="ej: 7 días, 2 semanas">
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label">Instrucciones Especiales</label>
-                                            <textarea class="form-control" name="instrucciones[]" rows="2" 
-                                                      placeholder="Tomar con alimentos, antes de dormir, etc.">{{ detalle.instrucciones }}</textarea>
-                                        </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Medicamento *</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors medicamento-select" name="medicamento[]" required>
+                                            <option value="">Seleccionar medicamento...</option>
+                                            {% for medicamento in medicamentos %}
+                                                <option value="{{ medicamento.id }}" 
+                                                        {% if medicamento.id == detalle.medicamento.id %}selected{% endif %}
+                                                        data-nombre="{{ medicamento.nombre_comercial }}"
+                                                        data-principio="{{ medicamento.principio_activo }}"
+                                                        data-concentracion="{{ medicamento.concentracion }}"
+                                                        data-tipo="{{ medicamento.tipo }}">
+                                                    {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
+                                                </option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Dosis *</label>
+                                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="dosis[]" 
+                                               value="{{ detalle.dosis }}" placeholder="ej: 500mg, 1 comprimido" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Frecuencia *</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="frecuencia[]" required>
+                                            <option value="">Seleccionar frecuencia...</option>
+                                            <option value="Cada 4 horas" {% if detalle.frecuencia == "Cada 4 horas" %}selected{% endif %}>Cada 4 horas</option>
+                                            <option value="Cada 6 horas" {% if detalle.frecuencia == "Cada 6 horas" %}selected{% endif %}>Cada 6 horas</option>
+                                            <option value="Cada 8 horas" {% if detalle.frecuencia == "Cada 8 horas" %}selected{% endif %}>Cada 8 horas</option>
+                                            <option value="Cada 12 horas" {% if detalle.frecuencia == "Cada 12 horas" %}selected{% endif %}>Cada 12 horas</option>
+                                            <option value="Una vez al día" {% if detalle.frecuencia == "Una vez al día" %}selected{% endif %}>Una vez al día</option>
+                                            <option value="Dos veces al día" {% if detalle.frecuencia == "Dos veces al día" %}selected{% endif %}>Dos veces al día</option>
+                                            <option value="Tres veces al día" {% if detalle.frecuencia == "Tres veces al día" %}selected{% endif %}>Tres veces al día</option>
+                                            <option value="Según necesidad" {% if detalle.frecuencia == "Según necesidad" %}selected{% endif %}>Según necesidad</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Duración</label>
+                                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="duracion[]" 
+                                               value="{{ detalle.duracion }}" placeholder="ej: 7 días, 2 semanas">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Instrucciones Especiales</label>
+                                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="instrucciones[]" rows="2" 
+                                                  placeholder="Tomar con alimentos, antes de dormir, etc.">{{ detalle.instrucciones }}</textarea>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
                             {% endfor %}
@@ -183,18 +226,32 @@
                         {% endif %}
                     </div>
 
-                    <!-- Observaciones -->
-                    <div class="mb-4">
-                        <label for="observaciones" class="form-label">Observaciones Generales</label>
-                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" 
-                                  placeholder="Instrucciones generales, precauciones especiales, etc.">{{ receta.observaciones }}</textarea>
+                    <!-- Observaciones Generales -->
+                    <div class="mb-6">
+                        <label for="observaciones" class="block text-sm font-medium text-gray-700 mb-2">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Observaciones Generales
+                        </label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" id="observaciones" name="observaciones" rows="4" 
+                                  placeholder="Observaciones adicionales sobre la receta...">{{ receta.observaciones }}</textarea>
+                        <p class="text-sm text-gray-500 mt-1">Información adicional que considere relevante para el paciente o farmacéutico.</p>
                     </div>
 
-                    <!-- Botones de acción -->
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'recetas_detail' receta.id %}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                    <!-- Botones de Acción -->
+                    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                        <a href="{% url 'recetas_detail' receta.id %}" class="inline-flex items-center px-6 py-2 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Guardar Cambios
                         </button>
                     </div>
                 </form>
@@ -202,29 +259,32 @@
         </div>
     </div>
     
-    <div class="col-lg-4">
+    <div class="lg:col-span-1">
         <!-- Historial de cambios -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-clock-history me-2"></i>Historial de Cambios
-                </h6>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Historial de Cambios
+                </h3>
             </div>
-            <div class="card-body">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-primary"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Receta creada</h6>
-                            <p class="text-muted mb-0">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-3 h-3 bg-blue-500 rounded-full mt-2"></div>
+                        <div class="ml-4">
+                            <h4 class="text-sm font-medium text-gray-900">Receta creada</h4>
+                            <p class="text-sm text-gray-500">{{ receta.fecha_prescripcion|date:"d/m/Y H:i" }}</p>
                         </div>
                     </div>
                     {% if receta.fecha_modificacion %}
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-warning"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Última modificación</h6>
-                            <p class="text-muted mb-0">{{ receta.fecha_modificacion|date:"d/m/Y H:i" }}</p>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-3 h-3 bg-yellow-500 rounded-full mt-2"></div>
+                        <div class="ml-4">
+                            <h4 class="text-sm font-medium text-gray-900">Última modificación</h4>
+                            <p class="text-sm text-gray-500">{{ receta.fecha_modificacion|date:"d/m/Y H:i" }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -233,13 +293,17 @@
         </div>
         
         <!-- Vista previa de la receta -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-eye me-2"></i>Vista Previa
-                </h6>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Vista Previa
+                </h3>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 <div id="preview-content">
                     <!-- Se actualizará dinámicamente -->
                 </div>
@@ -247,20 +311,43 @@
         </div>
         
         <!-- Ayuda -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-question-circle me-2"></i>Ayuda
-                </h6>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Ayuda
+                </h3>
             </div>
-            <div class="card-body">
-                <div class="small">
-                    <p><strong>Consejos para editar:</strong></p>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-check text-success me-2"></i>Verifique las dosis y frecuencias</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Actualice la fecha de vencimiento si es necesario</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Agregue observaciones importantes</li>
-                        <li><i class="bi bi-exclamation-triangle text-warning me-2"></i>Los cambios afectarán la prescripción actual</li>
+            <div class="p-6">
+                <div class="text-sm">
+                    <p class="font-semibold text-gray-900 mb-3">Consejos para editar:</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Verifique las dosis y frecuencias</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Actualice la fecha de vencimiento si es necesario</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Agregue observaciones importantes</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            <span class="text-gray-700">Los cambios afectarán la prescripción actual</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -270,60 +357,60 @@
 
 <!-- Template para medicamento -->
 <template id="medicamento-template">
-    <div class="card mb-3 medicamento-item">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <h6 class="card-title mb-0">Medicamento <span class="medicamento-number"></span></h6>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMedicamento(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-4 medicamento-item border-l-4 border-l-blue-500">
+        <div class="flex justify-between items-start mb-4">
+            <h6 class="text-lg font-medium text-gray-900">Medicamento <span class="medicamento-number"></span></h6>
+            <button type="button" class="inline-flex items-center px-2 py-1 border border-red-300 text-red-700 bg-white rounded hover:bg-red-50 transition-colors text-sm" onclick="removeMedicamento(this)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
+        </div>
             
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Medicamento *</label>
-                    <select class="form-select medicamento-select" name="medicamento[]" required>
-                        <option value="">Seleccionar medicamento...</option>
-                        {% for medicamento in medicamentos %}
-                            <option value="{{ medicamento.id }}" 
-                                    data-nombre="{{ medicamento.nombre_comercial }}"
-                                    data-principio="{{ medicamento.principio_activo }}"
-                                    data-concentracion="{{ medicamento.concentracion }}"
-                                    data-tipo="{{ medicamento.tipo }}">
-                                {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Dosis *</label>
-                    <input type="text" class="form-control" name="dosis[]" 
-                           placeholder="ej: 500mg, 1 comprimido" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Frecuencia *</label>
-                    <select class="form-select" name="frecuencia[]" required>
-                        <option value="">Seleccionar frecuencia...</option>
-                        <option value="Cada 4 horas">Cada 4 horas</option>
-                        <option value="Cada 6 horas">Cada 6 horas</option>
-                        <option value="Cada 8 horas">Cada 8 horas</option>
-                        <option value="Cada 12 horas">Cada 12 horas</option>
-                        <option value="Una vez al día">Una vez al día</option>
-                        <option value="Dos veces al día">Dos veces al día</option>
-                        <option value="Tres veces al día">Tres veces al día</option>
-                        <option value="Según necesidad">Según necesidad</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Duración</label>
-                    <input type="text" class="form-control" name="duracion[]" 
-                           placeholder="ej: 7 días, 2 semanas">
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Instrucciones Especiales</label>
-                    <textarea class="form-control" name="instrucciones[]" rows="2" 
-                              placeholder="Tomar con alimentos, antes de dormir, etc."></textarea>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Medicamento *</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors medicamento-select" name="medicamento[]" required>
+                    <option value="">Seleccionar medicamento...</option>
+                    {% for medicamento in medicamentos %}
+                        <option value="{{ medicamento.id }}" 
+                                data-nombre="{{ medicamento.nombre_comercial }}"
+                                data-principio="{{ medicamento.principio_activo }}"
+                                data-concentracion="{{ medicamento.concentracion }}"
+                                data-tipo="{{ medicamento.tipo }}">
+                            {{ medicamento.nombre_comercial }} ({{ medicamento.principio_activo }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Dosis *</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="dosis[]" 
+                       placeholder="ej: 500mg, 1 comprimido" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Frecuencia *</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="frecuencia[]" required>
+                    <option value="">Seleccionar frecuencia...</option>
+                    <option value="Cada 4 horas">Cada 4 horas</option>
+                    <option value="Cada 6 horas">Cada 6 horas</option>
+                    <option value="Cada 8 horas">Cada 8 horas</option>
+                    <option value="Cada 12 horas">Cada 12 horas</option>
+                    <option value="Una vez al día">Una vez al día</option>
+                    <option value="Dos veces al día">Dos veces al día</option>
+                    <option value="Tres veces al día">Tres veces al día</option>
+                    <option value="Según necesidad">Según necesidad</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Duración</label>
+                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="duracion[]" 
+                       placeholder="ej: 7 días, 2 semanas">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Instrucciones Especiales</label>
+                <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" name="instrucciones[]" rows="2" 
+                          placeholder="Tomar con alimentos, antes de dormir, etc."></textarea>
             </div>
         </div>
     </div>
@@ -332,87 +419,115 @@
 
 {% block extra_css %}
 <style>
+    /* Estilos de validación para formularios */
+    .form-field:invalid {
+        @apply border-red-300 focus:border-red-500 focus:ring-red-500;
+    }
+    
+    .form-field:valid {
+        @apply border-green-300 focus:border-green-500 focus:ring-green-500;
+    }
+    
+    .error-message {
+        @apply text-red-600 text-sm mt-1;
+    }
+    
+    .success-message {
+        @apply text-green-600 text-sm mt-1;
+    }
+    
+    /* Animaciones para elementos dinámicos */
     .medicamento-item {
-        border-left: 4px solid var(--primary-color);
+        animation: slideIn 0.3s ease-out;
     }
     
-    .timeline {
-        position: relative;
-        padding-left: 30px;
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 15px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background-color: #dee2e6;
-    }
-    
-    .timeline-item {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    
-    .timeline-marker {
-        position: absolute;
-        left: -23px;
-        top: 5px;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        border: 2px solid white;
-    }
-    
-    .timeline-content {
-        background-color: #f8f9fa;
-        padding: 10px 15px;
-        border-radius: 8px;
-        border-left: 3px solid var(--primary-color);
-    }
-    
+    /* Estilos para la vista previa */
     .preview-section {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
+        @apply border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50;
     }
     
     .preview-header {
-        border-bottom: 2px solid var(--primary-color);
-        padding-bottom: 10px;
-        margin-bottom: 15px;
+        @apply font-semibold text-gray-700 mb-2;
     }
     
     .medicamento-preview {
-        background-color: white;
-        border-radius: 6px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-left: 3px solid var(--secondary-color);
+        @apply bg-white rounded-md p-3 mb-2 border border-gray-100;
     }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    let medicamentoCounter = {{ receta.detalles.count }};
+    let medicamentoCounter = {{ receta.detalles.count|default:0 }};
     
     document.addEventListener('DOMContentLoaded', function() {
+        // Agregar estilos CSS para animación de salida
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
         updatePreview();
         
         // Event listeners para actualizar vista previa
-        document.getElementById('fecha_vencimiento').addEventListener('change', updatePreview);
-        document.getElementById('observaciones').addEventListener('input', updatePreview);
+        document.getElementById('fecha_vencimiento').addEventListener('change', function() {
+            updatePreview();
+            validateForm();
+        });
+        document.getElementById('observaciones').addEventListener('input', function() {
+            updatePreview();
+            validateForm();
+        });
         
         // Event listeners para medicamentos existentes
         const existingInputs = document.querySelectorAll('#medicamentos-container select, #medicamentos-container input, #medicamentos-container textarea');
         existingInputs.forEach(element => {
-            element.addEventListener('change', updatePreview);
-            element.addEventListener('input', updatePreview);
+            element.addEventListener('change', function() {
+                updatePreview();
+                validateForm();
+            });
+            element.addEventListener('input', function() {
+                updatePreview();
+                validateForm();
+            });
         });
+        
+        // Validación al enviar el formulario
+        const form = document.getElementById('receta-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    // Scroll al primer campo con error
+                    const firstError = form.querySelector('.border-red-300');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                }
+            });
+        }
     });
     
     function addMedicamento() {
@@ -426,30 +541,60 @@
         // Agregar event listeners
         const selects = clone.querySelectorAll('select, input, textarea');
         selects.forEach(element => {
-            element.addEventListener('change', updatePreview);
-            element.addEventListener('input', updatePreview);
+            element.addEventListener('change', function() {
+                updatePreview();
+                validateForm();
+            });
+            element.addEventListener('input', function() {
+                updatePreview();
+                validateForm();
+            });
         });
         
         document.getElementById('medicamentos-container').appendChild(clone);
-        document.getElementById('no-medicamentos').classList.add('d-none');
+        document.getElementById('no-medicamentos').classList.add('hidden');
         updatePreview();
     }
     
     function removeMedicamento(button) {
-        button.closest('.medicamento-item').remove();
+        const medicamentoItem = button.closest('.medicamento-item');
+        medicamentoItem.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+            medicamentoItem.remove();
+            
+            // Renumerar medicamentos
+            const items = document.querySelectorAll('.medicamento-item');
+            items.forEach((item, index) => {
+                item.querySelector('.medicamento-number').textContent = index + 1;
+            });
+            
+            if (items.length === 0) {
+                document.getElementById('no-medicamentos').classList.remove('hidden');
+                medicamentoCounter = 0;
+            }
+            
+            updatePreview();
+        }, 300);
+    }
+    
+    // Validación en tiempo real
+    function validateForm() {
+        const form = document.getElementById('receta-form');
+        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+        let isValid = true;
         
-        // Renumerar medicamentos
-        const items = document.querySelectorAll('.medicamento-item');
-        items.forEach((item, index) => {
-            item.querySelector('.medicamento-number').textContent = index + 1;
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+                input.classList.remove('border-green-300', 'focus:border-green-500', 'focus:ring-green-500');
+                isValid = false;
+            } else {
+                input.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+                input.classList.add('border-green-300', 'focus:border-green-500', 'focus:ring-green-500');
+            }
         });
         
-        if (items.length === 0) {
-            document.getElementById('no-medicamentos').classList.remove('d-none');
-            medicamentoCounter = 0;
-        }
-        
-        updatePreview();
+        return isValid;
     }
     
     function updatePreview() {
@@ -462,42 +607,77 @@
         let medicamentosHtml = '';
         medicamentos.forEach((item, index) => {
             const medicamentoSelect = item.querySelector('.medicamento-select');
-            const dosis = item.querySelector('input[name="dosis[]"]').value;
-            const frecuencia = item.querySelector('select[name="frecuencia[]"]').value;
-            const duracion = item.querySelector('input[name="duracion[]"]').value;
-            const instrucciones = item.querySelector('textarea[name="instrucciones[]"]').value;
+            const dosis = item.querySelector('input[name="dosis[]"]')?.value || '';
+            const frecuencia = item.querySelector('select[name="frecuencia[]"]')?.value || '';
+            const duracion = item.querySelector('input[name="duracion[]"]')?.value || '';
+            const instrucciones = item.querySelector('textarea[name="instrucciones[]"]')?.value || '';
             
-            if (medicamentoSelect.value) {
+            if (medicamentoSelect && medicamentoSelect.value) {
                 const medicamentoOption = medicamentoSelect.options[medicamentoSelect.selectedIndex];
                 medicamentosHtml += `
                     <div class="medicamento-preview">
-                        <strong>${medicamentoOption.dataset.nombre}</strong>
-                        <br><small class="text-muted">${medicamentoOption.dataset.principio} - ${medicamentoOption.dataset.concentracion}</small>
-                        ${dosis ? `<br><strong>Dosis:</strong> ${dosis}` : ''}
-                        ${frecuencia ? `<br><strong>Frecuencia:</strong> ${frecuencia}` : ''}
-                        ${duracion ? `<br><strong>Duración:</strong> ${duracion}` : ''}
-                        ${instrucciones ? `<br><strong>Instrucciones:</strong> ${instrucciones}` : ''}
+                        <div class="font-medium text-gray-900">${index + 1}. ${medicamentoOption.dataset.nombre}</div>
+                        <div class="text-sm text-gray-500 mt-1">${medicamentoOption.dataset.principio} - ${medicamentoOption.dataset.concentracion}</div>
+                        <div class="text-sm text-gray-600 mt-2">
+                            ${dosis ? `<span class="inline-block mr-4"><strong>Dosis:</strong> ${dosis}</span>` : ''}
+                            ${frecuencia ? `<span class="inline-block mr-4"><strong>Frecuencia:</strong> ${frecuencia}</span>` : ''}
+                            ${duracion ? `<span class="inline-block mr-4"><strong>Duración:</strong> ${duracion}</span>` : ''}
+                        </div>
+                        ${instrucciones ? `<div class="text-sm text-gray-500 mt-1"><strong>Instrucciones:</strong> ${instrucciones}</div>` : ''}
                     </div>
                 `;
             }
         });
         
-        previewContent.innerHTML = `
+        let html = '';
+        
+        // Información básica
+        html += `
             <div class="preview-section">
-                <div class="preview-header">
-                    <h6 class="mb-0">RECETA MÉDICA</h6>
+                <div class="preview-header text-lg font-semibold text-gray-900 mb-3">RECETA MÉDICA</div>
+                <div class="space-y-2 text-sm">
+                    <p class="text-gray-700"><strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</p>
+                    <p class="text-gray-700"><strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</p>
+                    <p class="text-gray-700"><strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}</p>
+                    <p class="text-gray-700"><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
                 </div>
-                <p><strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</p>
-                <p><strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</p>
-                <p><strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}</p>
-                <p><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
-                
-                <h6 class="mt-3 mb-2">Medicamentos:</h6>
-                ${medicamentosHtml || '<p class="text-muted">No hay medicamentos agregados</p>'}
-                
-                ${observaciones.value ? `<h6 class="mt-3 mb-2">Observaciones:</h6><p>${observaciones.value}</p>` : ''}
             </div>
         `;
+        
+        // Medicamentos
+        if (medicamentosHtml) {
+            html += `
+                <div class="preview-section">
+                    <div class="preview-header text-base font-semibold text-gray-900 mb-3">Medicamentos:</div>
+                    <div class="space-y-3">
+                        ${medicamentosHtml}
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="preview-section">
+                    <div class="preview-header text-base font-semibold text-gray-900 mb-3">Medicamentos:</div>
+                    <p class="text-gray-500 text-sm">No hay medicamentos agregados</p>
+                </div>
+            `;
+        }
+        
+        // Observaciones
+        if (observaciones.value) {
+            html += `
+                <div class="preview-section">
+                    <div class="preview-header text-base font-semibold text-gray-900 mb-3">Observaciones:</div>
+                    <p class="text-gray-700 text-sm">${observaciones.value}</p>
+                </div>
+            `;
+        }
+        
+        if (!html) {
+            html = '<div class="text-center text-gray-500 py-8">Complete los campos para ver la vista previa</div>';
+        }
+        
+        previewContent.innerHTML = html;
     }
 </script>
-{% endblock %}
+{% endblock %>

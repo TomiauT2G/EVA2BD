@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Historial Clínico - {{ historial.paciente.nombre }} {{ historial.paciente.apellido }} - Sistema Salud Vital{% endblock %}
+
+{% block page_title %}Editar Historial Clínico{% endblock %}
+{% block page_description %}Modificar información del historial clínico de {{ historial.paciente.nombre }} {{ historial.paciente.apellido }}{% endblock %}
+
+{% block page_actions %}
+<div class="flex space-x-3">
+    <a href="{% url 'historiales_detail' historial.id %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Volver al Detalle
+    </a>
+    <a href="{% url 'historiales_list' %}" class="inline-flex items-center px-4 py-2 bg-info-600 hover:bg-info-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+        </svg>
+        Ver Lista
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-warning-600 to-orange-600">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Editar Historial Clínico
+            </h3>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Por favor corrija los siguientes errores:
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Información del Paciente (Solo lectura) -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Paciente
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Nombre Completo</label>
+                        <p class="text-lg font-semibold text-gray-900">{{ historial.paciente.nombre }} {{ historial.paciente.apellido }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">RUT</label>
+                        <p class="text-lg text-gray-900">{{ historial.paciente.rut }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Fecha de Nacimiento</label>
+                        <p class="text-lg text-gray-900">{{ historial.paciente.fecha_nacimiento|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paciente (Hidden field) -->
+            {{ form.paciente.as_hidden }}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tipo de Sangre -->
+                <div>
+                    <label for="{{ form.tipo_sangre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Sangre
+                    </label>
+                    {{ form.tipo_sangre }}
+                    {% if form.tipo_sangre.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.tipo_sangre.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Peso -->
+                <div>
+                    <label for="{{ form.peso.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Peso (kg)
+                    </label>
+                    {{ form.peso }}
+                    {% if form.peso.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.peso.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Altura -->
+                <div>
+                    <label for="{{ form.altura.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Altura (cm)
+                    </label>
+                    {{ form.altura }}
+                    {% if form.altura.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.altura.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Presión Arterial -->
+                <div>
+                    <label for="{{ form.presion_arterial.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Presión Arterial
+                    </label>
+                    {{ form.presion_arterial }}
+                    {% if form.presion_arterial.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.presion_arterial.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- BMI Display -->
+            <div id="bmi-display" class="hidden p-4 bg-blue-50 rounded-lg">
+                <label class="block text-sm font-medium text-blue-700 mb-1">Índice de Masa Corporal (IMC)</label>
+                <p class="text-lg font-semibold text-blue-900" id="bmi-value"></p>
+                <p class="text-sm text-blue-600" id="bmi-category"></p>
+            </div>
+
+            <!-- Alergias -->
+            <div>
+                <label for="{{ form.alergias.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Alergias
+                </label>
+                {{ form.alergias }}
+                {% if form.alergias.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.alergias.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Enfermedades Crónicas -->
+            <div>
+                <label for="{{ form.enfermedades_cronicas.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Enfermedades Crónicas
+                </label>
+                {{ form.enfermedades_cronicas }}
+                {% if form.enfermedades_cronicas.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.enfermedades_cronicas.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Medicamentos Actuales -->
+            <div>
+                <label for="{{ form.medicamentos_actuales.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Medicamentos Actuales
+                </label>
+                {{ form.medicamentos_actuales }}
+                {% if form.medicamentos_actuales.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.medicamentos_actuales.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Antecedentes Familiares -->
+            <div>
+                <label for="{{ form.antecedentes_familiares.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Antecedentes Familiares
+                </label>
+                {{ form.antecedentes_familiares }}
+                {% if form.antecedentes_familiares.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.antecedentes_familiares.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Antecedentes Quirúrgicos -->
+            <div>
+                <label for="{{ form.antecedentes_quirurgicos.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Antecedentes Quirúrgicos
+                </label>
+                {{ form.antecedentes_quirurgicos }}
+                {% if form.antecedentes_quirurgicos.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.antecedentes_quirurgicos.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Observaciones -->
+            <div>
+                <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Observaciones Generales
+                </label>
+                {{ form.observaciones }}
+                {% if form.observaciones.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.observaciones.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Información de Auditoría -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Información de Auditoría
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Fecha de Creación</label>
+                        <p class="text-sm text-gray-900">{{ historial.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Última Actualización</label>
+                        <p class="text-sm text-gray-900">{{ historial.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'historiales_detail' historial.id %}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 bg-warning-600 hover:bg-warning-700 text-white rounded-lg transition-colors duration-200 flex items-center shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pesoInput = document.getElementById('{{ form.peso.id_for_label }}');
+    const alturaInput = document.getElementById('{{ form.altura.id_for_label }}');
+    const bmiDisplay = document.getElementById('bmi-display');
+    const bmiValue = document.getElementById('bmi-value');
+    const bmiCategory = document.getElementById('bmi-category');
+    
+    function calculateBMI() {
+        const peso = parseFloat(pesoInput.value);
+        const altura = parseFloat(alturaInput.value);
+        
+        if (peso && altura && altura > 0) {
+            const alturaMetros = altura / 100;
+            const bmi = peso / (alturaMetros * alturaMetros);
+            
+            bmiValue.textContent = bmi.toFixed(1);
+            
+            let category = '';
+            let categoryClass = '';
+            
+            if (bmi < 18.5) {
+                category = 'Bajo peso';
+                categoryClass = 'text-blue-600';
+            } else if (bmi < 25) {
+                category = 'Peso normal';
+                categoryClass = 'text-green-600';
+            } else if (bmi < 30) {
+                category = 'Sobrepeso';
+                categoryClass = 'text-yellow-600';
+            } else {
+                category = 'Obesidad';
+                categoryClass = 'text-red-600';
+            }
+            
+            bmiCategory.textContent = category;
+            bmiCategory.className = 'text-sm ' + categoryClass;
+            bmiDisplay.classList.remove('hidden');
+        } else {
+            bmiDisplay.classList.add('hidden');
+        }
+    }
+    
+    if (pesoInput && alturaInput) {
+        pesoInput.addEventListener('input', calculateBMI);
+        alturaInput.addEventListener('input', calculateBMI);
+        
+        // Calculate on page load if values exist
+        calculateBMI();
+    }
+});
+</script>
+{% endblock %}

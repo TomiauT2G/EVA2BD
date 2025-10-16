@@ -3,365 +3,282 @@
 {% block title %}Nuevo Tratamiento - Sistema Salud Vital{% endblock %}
 
 {% block page_title %}Nuevo Tratamiento{% endblock %}
-{% block page_description %}Registrar un nuevo tratamiento médico{% endblock %}
+{% block page_description %}Crear un nuevo plan de tratamiento médico{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'tratamientos_list' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-2"></i>
-    Volver a Lista
+<a href="{% url 'tratamientos_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Volver a la lista
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-clipboard-plus me-2"></i>
-                    Registrar Nuevo Tratamiento
-                </h5>
-            </div>
-            
-            <div class="card-body">
-                <form method="POST" class="needs-validation" novalidate>
-                    {% csrf_token %}
-                    
-                    <!-- Consultation Information -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-primary border-bottom pb-2 mb-3">
-                                <i class="bi bi-clipboard-data me-2"></i>
-                                Información de la Consulta
-                            </h6>
-                        </div>
-                        
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.consulta.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar-check me-1"></i>
-                                Consulta Médica *
-                            </label>
-                            {{ form.consulta }}
-                            {% if form.consulta.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.consulta.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Seleccione la consulta médica asociada a este tratamiento
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Treatment Details -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="text-success border-bottom pb-2 mb-3">
-                                <i class="bi bi-heart-pulse me-2"></i>
-                                Detalles del Tratamiento
-                            </h6>
-                        </div>
-                        
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
-                                <i class="bi bi-tag me-1"></i>
-                                Nombre del Tratamiento *
-                            </label>
-                            {{ form.nombre }}
-                            {% if form.nombre.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.nombre.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
-                                <i class="bi bi-journal-text me-1"></i>
-                                Descripción del Tratamiento *
-                            </label>
-                            {{ form.descripcion }}
-                            {% if form.descripcion.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.descripcion.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.duracion_dias.id_for_label }}" class="form-label">
-                                <i class="bi bi-clock me-1"></i>
-                                Duración (días) *
-                            </label>
-                            {{ form.duracion_dias }}
-                            {% if form.duracion_dias.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.duracion_dias.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar-event me-1"></i>
-                                Fecha de Inicio
-                            </label>
-                            {{ form.fecha_inicio }}
-                            {% if form.fecha_inicio.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.fecha_inicio.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Si no se especifica, se puede definir posteriormente
-                            </div>
-                        </div>
-                        
-                        <div class="col-12 mb-3">
-                            <label for="{{ form.instrucciones.id_for_label }}" class="form-label">
-                                <i class="bi bi-list-check me-1"></i>
-                                Instrucciones Especiales
-                            </label>
-                            {{ form.instrucciones }}
-                            {% if form.instrucciones.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.instrucciones.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
-                                    <i class="bi bi-x-circle me-2"></i>
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Registrar Tratamiento
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Preview Card -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-eye me-2"></i>
-                    Vista Previa
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-3">
-                    <div class="avatar-circle bg-success text-white d-inline-flex align-items-center justify-content-center">
-                        <i class="bi bi-heart-pulse fs-3"></i>
-                    </div>
+<div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Form -->
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-success-600">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        Información del Tratamiento
+                    </h3>
                 </div>
                 
-                <div id="preview-content">
-                    <p class="text-muted text-center">Complete el formulario para ver la vista previa</p>
+                <div class="p-6">
+                    {% if form.errors %}
+                        <div class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                            <div class="flex">
+                                <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-medium text-red-800">Errores en el formulario:</h4>
+                                    <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Consulta -->
+                        <div>
+                            <label for="{{ form.consulta.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                                Consulta Médica *
+                            </label>
+                            <select id="{{ form.consulta.id_for_label }}" name="{{ form.consulta.name }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.consulta.errors %}border-red-300{% endif %}">
+                                <option value="">Seleccione una consulta</option>
+                                {% for choice in form.consulta.field.queryset %}
+                                    <option value="{{ choice.pk }}" {% if form.consulta.value == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.consulta.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {% for error in form.consulta.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">
+                                Consulta médica asociada a este tratamiento
+                            </p>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div>
+                            <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Descripción del Tratamiento *
+                            </label>
+                            <textarea id="{{ form.descripcion.id_for_label }}" name="{{ form.descripcion.name }}" rows="4" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.descripcion.errors %}border-red-300{% endif %}" placeholder="Describa detalladamente el plan de tratamiento, objetivos, procedimientos...">{{ form.descripcion.value|default:'' }}</textarea>
+                            {% if form.descripcion.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {% for error in form.descripcion.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">
+                                Descripción detallada del plan de tratamiento
+                            </p>
+                        </div>
+
+                        <!-- Fechas de Inicio y Fin -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Fecha de Inicio *
+                                </label>
+                                <input type="date" id="{{ form.fecha_inicio.id_for_label }}" name="{{ form.fecha_inicio.name }}" value="{{ form.fecha_inicio.value|default:'' }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.fecha_inicio.errors %}border-red-300{% endif %}">
+                                {% if form.fecha_inicio.errors %}
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {% for error in form.fecha_inicio.errors %}{{ error }}{% endfor %}
+                                    </p>
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Fecha de inicio del tratamiento
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="{{ form.fecha_fin.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Fecha de Finalización
+                                </label>
+                                <input type="date" id="{{ form.fecha_fin.id_for_label }}" name="{{ form.fecha_fin.name }}" value="{{ form.fecha_fin.value|default:'' }}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm {% if form.fecha_fin.errors %}border-red-300{% endif %}">
+                                {% if form.fecha_fin.errors %}
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {% for error in form.fecha_fin.errors %}{{ error }}{% endfor %}
+                                    </p>
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Fecha estimada de finalización (opcional)
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-between pt-6 border-t border-gray-200">
+                            <a href="{% url 'tratamientos_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-success-600 hover:from-primary-700 hover:to-success-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Crear Tratamiento
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
         
-        <!-- Help Card -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Información Importante
-                </h6>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        Los campos marcados con * son obligatorios
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        La consulta debe estar previamente registrada
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        La fecha de inicio puede definirse posteriormente
-                    </li>
-                    <li class="mb-0">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        Podrá agregar medicamentos después del registro
-                    </li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Duration Calculator -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-calculator me-2"></i>
-                    Calculadora de Duración
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(7)">
-                            1 Semana
-                        </button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(14)">
-                            2 Semanas
-                        </button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(30)">
-                            1 Mes
-                        </button>
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Información Importante -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-blue-50 border-b border-blue-200">
+                    <h4 class="text-sm font-semibold text-blue-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Información Importante
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Todos los campos marcados con (*) son obligatorios</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>La consulta médica debe estar previamente registrada</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>La fecha de fin es opcional pero recomendada</span>
+                        </div>
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Describa claramente los objetivos del tratamiento</span>
+                        </div>
                     </div>
                 </div>
-                <div class="row text-center mt-2">
-                    <div class="col-6">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(60)">
-                            2 Meses
-                        </button>
+            </div>
+
+            <!-- Guía de Tratamientos -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-yellow-50 border-b border-yellow-200">
+                    <h4 class="text-sm font-semibold text-yellow-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Guía de Tratamientos
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="bg-yellow-50 p-3 rounded-md">
+                            <p class="font-medium text-yellow-800 mb-1">Descripción:</p>
+                            <p>Incluya objetivos específicos, procedimientos y expectativas del tratamiento</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-md">
+                            <p class="font-medium text-blue-800 mb-1">Duración:</p>
+                            <p>Establezca fechas realistas basadas en la condición del paciente</p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-md">
+                            <p class="font-medium text-green-800 mb-1">Seguimiento:</p>
+                            <p>Planifique consultas de seguimiento regulares</p>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="setDuration(90)">
-                            3 Meses
-                        </button>
+                </div>
+            </div>
+
+            <!-- Tipos de Tratamiento -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-purple-50 border-b border-purple-200">
+                    <h4 class="text-sm font-semibold text-purple-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Tipos de Tratamiento
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="bg-red-50 p-3 rounded-md border border-red-200">
+                            <p class="font-medium text-red-800 mb-1">🩺 Farmacológico:</p>
+                            <p>Tratamientos basados en medicamentos</p>
+                        </div>
+                        <div class="bg-orange-50 p-3 rounded-md border border-orange-200">
+                            <p class="font-medium text-orange-800 mb-1">🏃 Fisioterapia:</p>
+                            <p>Rehabilitación física y ejercicios</p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-md border border-green-200">
+                            <p class="font-medium text-green-800 mb-1">🧠 Psicológico:</p>
+                            <p>Terapias de salud mental</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-md border border-blue-200">
+                            <p class="font-medium text-blue-800 mb-1">⚕️ Quirúrgico:</p>
+                            <p>Procedimientos e intervenciones</p>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-800 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Acciones Rápidas
+                    </h4>
+                </div>
+                <div class="p-4 space-y-2">
+                    <a href="{% url 'consultas_list' %}" class="block w-full text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        Ver Consultas
+                    </a>
+                    <a href="{% url 'recetas_list' %}" class="block w-full text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        Ver Recetas
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .avatar-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-    }
-    
-    .needs-validation .form-control:invalid {
-        border-color: #dc3545;
-    }
-    
-    .needs-validation .form-control:valid {
-        border-color: #198754;
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.needs-validation');
-        const previewContent = document.getElementById('preview-content');
-        const consultaSelect = document.getElementById('{{ form.consulta.id_for_label }}');
-        
-        // Form validation
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        });
-        
-        // Real-time preview
-        function updatePreview() {
-            const consulta = document.getElementById('{{ form.consulta.id_for_label }}');
-            const consultaText = consulta.options[consulta.selectedIndex]?.text || '';
-            const nombre = document.getElementById('{{ form.nombre.id_for_label }}').value;
-            const descripcion = document.getElementById('{{ form.descripcion.id_for_label }}').value;
-            const duracion = document.getElementById('{{ form.duracion_dias.id_for_label }}').value;
-            const fechaInicio = document.getElementById('{{ form.fecha_inicio.id_for_label }}').value;
-            
-            if (nombre || consultaText || duracion) {
-                let fechaFin = '';
-                if (fechaInicio && duracion) {
-                    const inicio = new Date(fechaInicio);
-                    const fin = new Date(inicio);
-                    fin.setDate(fin.getDate() + parseInt(duracion));
-                    fechaFin = fin.toLocaleDateString('es-ES');
-                }
-                
-                previewContent.innerHTML = `
-                    <div class="text-start">
-                        ${nombre ? `<p class="mb-1"><strong>Tratamiento:</strong> ${nombre}</p>` : ''}
-                        ${consultaText ? `<p class="mb-1"><strong>Consulta:</strong> ${consultaText.substring(0, 50)}${consultaText.length > 50 ? '...' : ''}</p>` : ''}
-                        ${duracion ? `<p class="mb-1"><strong>Duración:</strong> ${duracion} días</p>` : ''}
-                        ${fechaInicio ? `<p class="mb-1"><strong>Inicio:</strong> ${new Date(fechaInicio).toLocaleDateString('es-ES')}</p>` : ''}
-                        ${fechaFin ? `<p class="mb-1"><strong>Fin estimada:</strong> ${fechaFin}</p>` : ''}
-                        ${descripcion ? `<p class="mb-1"><strong>Descripción:</strong> ${descripcion.substring(0, 50)}${descripcion.length > 50 ? '...' : ''}</p>` : ''}
-                    </div>
-                `;
-            } else {
-                previewContent.innerHTML = '<p class="text-muted text-center">Complete el formulario para ver la vista previa</p>';
-            }
-        }
-        
-        // Add event listeners for real-time preview
-        ['{{ form.consulta.id_for_label }}', '{{ form.nombre.id_for_label }}', '{{ form.descripcion.id_for_label }}', '{{ form.duracion_dias.id_for_label }}', '{{ form.fecha_inicio.id_for_label }}'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('input', updatePreview);
-                element.addEventListener('change', updatePreview);
-            }
-        });
-        
-        // Set default start date to today
-        const fechaInicioInput = document.getElementById('{{ form.fecha_inicio.id_for_label }}');
-        if (fechaInicioInput && !fechaInicioInput.value) {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            fechaInicioInput.value = `${year}-${month}-${day}`;
-        }
-        
-        // Pre-select consultation if provided in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const consultaParam = urlParams.get('consulta');
-        if (consultaParam && consultaSelect) {
-            consultaSelect.value = consultaParam;
-            updatePreview();
-        }
-    });
-    
-    // Duration calculator functions
-    function setDuration(days) {
-        const duracionInput = document.getElementById('{{ form.duracion_dias.id_for_label }}');
-        if (duracionInput) {
-            duracionInput.value = days;
-            duracionInput.dispatchEvent(new Event('input'));
-        }
-    }
-</script>
 {% endblock %}

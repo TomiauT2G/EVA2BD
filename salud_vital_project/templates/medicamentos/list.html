@@ -6,377 +6,486 @@
 {% block page_description %}Administrar medicamentos del sistema{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'medicamentos_create' %}" class="btn btn-primary">
-    <i class="bi bi-plus-circle me-2"></i>
+<a href="{% url 'medicamentos_create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+    </svg>
     Nuevo Medicamento
 </a>
 {% endblock %}
 
 {% block content %}
-<!-- Search and Filters -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="GET" class="row g-3">
-            <div class="col-md-4">
-                <label for="search" class="form-label">
-                    <i class="bi bi-search me-1"></i>
-                    Buscar Medicamento
-                </label>
-                <input type="text" class="form-control" id="search" name="search" 
-                       value="{{ request.GET.search }}" 
-                       placeholder="Nombre, principio activo, laboratorio...">
-            </div>
-            
-            <div class="col-md-3">
-                <label for="tipo" class="form-label">
-                    <i class="bi bi-tags me-1"></i>
-                    Tipo de Medicamento
-                </label>
-                <select class="form-select" id="tipo" name="tipo">
-                    <option value="">Todos los tipos</option>
-                    <option value="tableta" {% if request.GET.tipo == 'tableta' %}selected{% endif %}>Tableta</option>
-                    <option value="capsula" {% if request.GET.tipo == 'capsula' %}selected{% endif %}>Cápsula</option>
-                    <option value="jarabe" {% if request.GET.tipo == 'jarabe' %}selected{% endif %}>Jarabe</option>
-                    <option value="inyeccion" {% if request.GET.tipo == 'inyeccion' %}selected{% endif %}>Inyección</option>
-                    <option value="crema" {% if request.GET.tipo == 'crema' %}selected{% endif %}>Crema</option>
-                    <option value="gotas" {% if request.GET.tipo == 'gotas' %}selected{% endif %}>Gotas</option>
-                    <option value="spray" {% if request.GET.tipo == 'spray' %}selected{% endif %}>Spray</option>
-                    <option value="otro" {% if request.GET.tipo == 'otro' %}selected{% endif %}>Otro</option>
-                </select>
-            </div>
-            
-            <div class="col-md-3">
-                <label for="requiere_receta" class="form-label">
-                    <i class="bi bi-prescription me-1"></i>
-                    Requiere Receta
-                </label>
-                <select class="form-select" id="requiere_receta" name="requiere_receta">
-                    <option value="">Todos</option>
-                    <option value="true" {% if request.GET.requiere_receta == 'true' %}selected{% endif %}>Sí</option>
-                    <option value="false" {% if request.GET.requiere_receta == 'false' %}selected{% endif %}>No</option>
-                </select>
-            </div>
-            
-            <div class="col-md-2">
-                <label class="form-label">&nbsp;</label>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-search me-2"></i>
+<div class="space-y-6">
+    <!-- Search and Filters Section -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-primary-600 to-success-600">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+                </svg>
+                Filtros de Búsqueda
+            </h3>
+        </div>
+        <div class="p-6">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Buscar Medicamento
+                    </label>
+                    <input type="text" id="search" name="search" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200" 
+                           value="{{ request.GET.search }}" placeholder="Nombre o descripción...">
+                </div>
+                
+                <div>
+                    <label for="stock_bajo" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        Stock Bajo
+                    </label>
+                    <select id="stock_bajo" name="stock_bajo" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        <option value="">Todos</option>
+                        <option value="true" {% if request.GET.stock_bajo == 'true' %}selected{% endif %}>Solo stock bajo (≤10)</option>
+                    </select>
+                </div>
+                
+                <div class="lg:col-span-3 flex gap-2">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                         Buscar
                     </button>
+                    {% if request.GET.search or request.GET.stock_bajo %}
+                        <a href="{% url 'medicamentos_list' %}" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Limpiar Filtros
+                        </a>
+                    {% endif %}
                 </div>
-            </div>
-        </form>
-        
-        {% if request.GET.search or request.GET.tipo or request.GET.requiere_receta %}
-        <div class="mt-3">
-            <a href="{% url 'medicamentos_list' %}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-x-circle me-2"></i>
-                Limpiar Filtros
-            </a>
+            </form>
         </div>
-        {% endif %}
     </div>
-</div>
 
-<!-- Results Summary -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <p class="text-muted">
-            <i class="bi bi-info-circle me-1"></i>
+    <!-- Results Summary and View Toggle -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex items-center text-gray-600">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
             Mostrando {{ medicamentos.start_index }}-{{ medicamentos.end_index }} de {{ paginator.count }} medicamentos
-        </p>
-    </div>
-    <div class="col-md-6 text-end">
-        <div class="btn-group" role="group" aria-label="Vista">
-            <input type="radio" class="btn-check" name="view" id="view-table" autocomplete="off" checked>
-            <label class="btn btn-outline-secondary btn-sm" for="view-table">
-                <i class="bi bi-table"></i>
-            </label>
-            <input type="radio" class="btn-check" name="view" id="view-grid" autocomplete="off">
-            <label class="btn btn-outline-secondary btn-sm" for="view-grid">
-                <i class="bi bi-grid-3x3"></i>
-            </label>
+        </div>
+        <div class="flex bg-gray-100 rounded-lg p-1">
+            <button id="view-table" class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-900 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9"></path>
+                </svg>
+            </button>
+            <button id="view-grid" class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-gray-500 hover:text-gray-900">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+            </button>
         </div>
     </div>
-</div>
 
-<!-- Table View -->
-<div id="table-view">
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+    <!-- Table View -->
+    <div id="table-view" class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                Lista de Medicamentos
+            </h3>
+        </div>
+        
+        {% if medicamentos %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>
-                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.tipo %}tipo={{ request.GET.tipo }}&{% endif %}{% if request.GET.requiere_receta %}requiere_receta={{ request.GET.requiere_receta }}&{% endif %}ordering={% if request.GET.ordering == 'nombre' %}-nombre{% else %}nombre{% endif %}" 
-                                   class="text-decoration-none text-dark">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}ordering={% if request.GET.ordering == 'nombre' %}-nombre{% else %}nombre{% endif %}" 
+                                   class="flex items-center hover:text-gray-700 transition-colors duration-200">
                                     Medicamento
                                     {% if request.GET.ordering == 'nombre' %}
-                                        <i class="bi bi-arrow-up"></i>
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
                                     {% elif request.GET.ordering == '-nombre' %}
-                                        <i class="bi bi-arrow-down"></i>
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
                                     {% endif %}
                                 </a>
                             </th>
-                            <th>Principio Activo</th>
-                            <th>Tipo</th>
-                            <th>Concentración</th>
-                            <th>Laboratorio</th>
-                            <th>Receta</th>
-                            <th>Acciones</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}ordering={% if request.GET.ordering == 'stock' %}-stock{% else %}stock{% endif %}" 
+                                   class="flex items-center hover:text-gray-700 transition-colors duration-200">
+                                    Stock
+                                    {% if request.GET.ordering == 'stock' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    {% elif request.GET.ordering == '-stock' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    {% endif %}
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}ordering={% if request.GET.ordering == 'precio_unitario' %}-precio_unitario{% else %}precio_unitario{% endif %}" 
+                                   class="flex items-center hover:text-gray-700 transition-colors duration-200">
+                                    Precio
+                                    {% if request.GET.ordering == 'precio_unitario' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    {% elif request.GET.ordering == '-precio_unitario' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    {% endif %}
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}ordering={% if request.GET.ordering == 'fecha_vencimiento' %}-fecha_vencimiento{% else %}fecha_vencimiento{% endif %}" 
+                                   class="flex items-center hover:text-gray-700 transition-colors duration-200">
+                                    Vencimiento
+                                    {% if request.GET.ordering == 'fecha_vencimiento' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    {% elif request.GET.ordering == '-fecha_vencimiento' %}
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    {% endif %}
+                                </a>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         {% for medicamento in medicamentos %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="medication-icon me-3">
-                                        {% if medicamento.tipo == 'tableta' %}
-                                            <i class="bi bi-circle-fill text-primary"></i>
-                                        {% elif medicamento.tipo == 'capsula' %}
-                                            <i class="bi bi-capsule text-success"></i>
-                                        {% elif medicamento.tipo == 'jarabe' %}
-                                            <i class="bi bi-cup text-warning"></i>
-                                        {% elif medicamento.tipo == 'inyeccion' %}
-                                            <i class="bi bi-bandaid text-danger"></i>
-                                        {% else %}
-                                            <i class="bi bi-prescription2 text-info"></i>
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                                <svg class="h-5 w-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ medicamento.nombre }}</div>
+                                            {% if medicamento.descripcion %}
+                                                <div class="text-sm text-gray-500">{{ medicamento.descripcion|truncatechars:50 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900">{{ medicamento.stock }}</span>
+                                        {% if medicamento.stock_bajo %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Bajo
+                                            </span>
                                         {% endif %}
                                     </div>
-                                    <div>
-                                        <div class="fw-bold">{{ medicamento.nombre }}</div>
-                                        {% if medicamento.descripcion %}
-                                            <small class="text-muted">{{ medicamento.descripcion|truncatechars:50 }}</small>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-green-600">${{ medicamento.precio_unitario }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900">{{ medicamento.fecha_vencimiento|date:"d/m/Y" }}</span>
+                                        {% if medicamento.proximo_vencimiento %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Próximo a vencer
+                                            </span>
                                         {% endif %}
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="fw-medium">{{ medicamento.principio_activo }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark">{{ medicamento.get_tipo_display }}</span>
-                            </td>
-                            <td>
-                                <span class="text-primary fw-medium">{{ medicamento.concentracion }}</span>
-                            </td>
-                            <td>{{ medicamento.laboratorio|default:"-" }}</td>
-                            <td>
-                                {% if medicamento.requiere_receta %}
-                                    <span class="badge bg-warning">
-                                        <i class="bi bi-prescription me-1"></i>
-                                        Sí
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle me-1"></i>
-                                        No
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{% url 'medicamentos_detail' medicamento.id %}" 
-                                       class="btn btn-outline-info btn-sm" 
-                                       title="Ver detalles">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{% url 'medicamentos_edit' medicamento.id %}" 
-                                       class="btn btn-outline-warning btn-sm" 
-                                       title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <button type="button" 
-                                            class="btn btn-outline-danger btn-sm" 
-                                            title="Eliminar"
-                                            onclick="confirmDelete('{{ medicamento.id }}', '{{ medicamento.nombre }}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-capsule fs-1 mb-3 d-block"></i>
-                                    <h5>No se encontraron medicamentos</h5>
-                                    <p>No hay medicamentos que coincidan con los criterios de búsqueda.</p>
-                                    <a href="{% url 'medicamentos_create' %}" class="btn btn-primary">
-                                        <i class="bi bi-plus-circle me-2"></i>
-                                        Agregar Primer Medicamento
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if medicamento.stock_bajo %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Stock Bajo
+                                        </span>
+                                    {% elif medicamento.proximo_vencimiento %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Próximo a vencer
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Normal
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                    <div class="flex justify-center space-x-2">
+                                        <a href="{% url 'medicamentos_detail' medicamento.id %}" 
+                                           class="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200" 
+                                           title="Ver detalles">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="{% url 'medicamentos_edit' medicamento.id %}" 
+                                           class="text-yellow-600 hover:text-yellow-900 p-2 rounded-lg hover:bg-yellow-50 transition-colors duration-200" 
+                                           title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                        <button type="button" 
+                                                class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200" 
+                                                title="Eliminar"
+                                                onclick="confirmDelete('{{ medicamento.id }}', '{{ medicamento.nombre }}')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </div>
+        {% else %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">No se encontraron medicamentos</h3>
+                <p class="mt-2 text-gray-500">No hay medicamentos que coincidan con los criterios de búsqueda.</p>
+                <div class="mt-6">
+                    <a href="{% url 'medicamentos_create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Agregar Primer Medicamento
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
-</div>
 
-<!-- Grid View -->
-<div id="grid-view" style="display: none;">
-    <div class="row">
-        {% for medicamento in medicamentos %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-start mb-3">
-                        <div class="medication-icon me-3">
-                            {% if medicamento.tipo == 'tableta' %}
-                                <i class="bi bi-circle-fill text-primary fs-3"></i>
-                            {% elif medicamento.tipo == 'capsula' %}
-                                <i class="bi bi-capsule text-success fs-3"></i>
-                            {% elif medicamento.tipo == 'jarabe' %}
-                                <i class="bi bi-cup text-warning fs-3"></i>
-                            {% elif medicamento.tipo == 'inyeccion' %}
-                                <i class="bi bi-bandaid text-danger fs-3"></i>
-                            {% else %}
-                                <i class="bi bi-prescription2 text-info fs-3"></i>
+    <!-- Grid View -->
+    <div id="grid-view" class="hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for medicamento in medicamentos %}
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-12 w-12">
+                                    <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <h3 class="text-lg font-medium text-gray-900">{{ medicamento.nombre }}</h3>
+                                    {% if medicamento.descripcion %}
+                                        <p class="text-sm text-gray-500">{{ medicamento.descripcion|truncatechars:50 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if medicamento.stock_bajo %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            {% elif medicamento.proximo_vencimiento %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
                             {% endif %}
                         </div>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1">{{ medicamento.nombre }}</h6>
-                            <p class="text-muted small mb-0">{{ medicamento.principio_activo }}</p>
-                        </div>
-                        {% if medicamento.requiere_receta %}
-                            <span class="badge bg-warning">
-                                <i class="bi bi-prescription"></i>
-                            </span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <div class="fw-bold text-primary">{{ medicamento.concentracion }}</div>
-                                    <small class="text-muted">Concentración</small>
-                                </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-primary-600">{{ medicamento.stock }}</div>
+                                <div class="text-xs text-gray-500">Stock</div>
                             </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <div class="fw-bold text-success">{{ medicamento.get_tipo_display }}</div>
-                                    <small class="text-muted">Tipo</small>
-                                </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-green-600">${{ medicamento.precio_unitario }}</div>
+                                <div class="text-xs text-gray-500">Precio</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-blue-600">{{ medicamento.fecha_vencimiento|date:"m/Y" }}</div>
+                                <div class="text-xs text-gray-500">Vence</div>
                             </div>
                         </div>
                     </div>
                     
-                    {% if medicamento.descripcion %}
-                    <p class="card-text small">{{ medicamento.descripcion|truncatechars:80 }}</p>
-                    {% endif %}
-                    
-                    {% if medicamento.laboratorio %}
-                    <p class="text-muted small mb-3">
-                        <i class="bi bi-building me-1"></i>
-                        {{ medicamento.laboratorio }}
-                    </p>
-                    {% endif %}
-                </div>
-                
-                <div class="card-footer bg-transparent">
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'medicamentos_detail' medicamento.id %}" class="btn btn-outline-info btn-sm">
-                            <i class="bi bi-eye me-1"></i>
-                            Ver
-                        </a>
-                        <a href="{% url 'medicamentos_edit' medicamento.id %}" class="btn btn-outline-warning btn-sm">
-                            <i class="bi bi-pencil me-1"></i>
-                            Editar
-                        </a>
-                        <button type="button" class="btn btn-outline-danger btn-sm" 
-                                onclick="confirmDelete('{{ medicamento.id }}', '{{ medicamento.nombre }}')">
-                            <i class="bi bi-trash me-1"></i>
-                            Eliminar
-                        </button>
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                        <div class="flex justify-between space-x-2">
+                            <a href="{% url 'medicamentos_detail' medicamento.id %}" class="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors duration-200">
+                                Ver
+                            </a>
+                            <a href="{% url 'medicamentos_edit' medicamento.id %}" class="flex-1 text-center px-3 py-2 text-sm font-medium text-yellow-600 bg-yellow-50 rounded-md hover:bg-yellow-100 transition-colors duration-200">
+                                Editar
+                            </a>
+                            <button type="button" class="flex-1 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-200" 
+                                    onclick="confirmDelete('{{ medicamento.id }}', '{{ medicamento.nombre }}')">
+                                Eliminar
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">No se encontraron medicamentos</h3>
+                    <p class="mt-2 text-gray-500">No hay medicamentos que coincidan con los criterios de búsqueda.</p>
+                    <div class="mt-6">
+                        <a href="{% url 'medicamentos_create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Agregar Primer Medicamento
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="text-center py-5">
-                <i class="bi bi-capsule fs-1 text-muted mb-3 d-block"></i>
-                <h5>No se encontraron medicamentos</h5>
-                <p class="text-muted">No hay medicamentos que coincidan con los criterios de búsqueda.</p>
-                <a href="{% url 'medicamentos_create' %}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>
-                    Agregar Primer Medicamento
-                </a>
-            </div>
-        </div>
-        {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if medicamentos.has_other_pages %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg shadow">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if medicamentos.has_previous %}
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}page={{ medicamentos.previous_page_number }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Anterior
+                    </a>
+                {% endif %}
+                {% if medicamentos.has_next %}
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}page={{ medicamentos.next_page_number }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Siguiente
+                    </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Página <span class="font-medium">{{ medicamentos.number }}</span> de <span class="font-medium">{{ medicamentos.paginator.num_pages }}</span>
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if medicamentos.has_previous %}
+                            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}page={{ medicamentos.previous_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in medicamentos.paginator.page_range %}
+                            {% if medicamentos.number == num %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-primary-50 text-sm font-medium text-primary-600">
+                                    {{ num }}
+                                </span>
+                            {% elif num > medicamentos.number|add:'-3' and num < medicamentos.number|add:'3' %}
+                                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}page={{ num }}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    {{ num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if medicamentos.has_next %}
+                            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.stock_bajo %}stock_bajo={{ request.GET.stock_bajo }}&{% endif %}page={{ medicamentos.next_page_number }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
-<!-- Pagination -->
-{% if medicamentos.has_other_pages %}
-<nav aria-label="Navegación de medicamentos" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if medicamentos.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.tipo %}tipo={{ request.GET.tipo }}&{% endif %}{% if request.GET.requiere_receta %}requiere_receta={{ request.GET.requiere_receta }}&{% endif %}page={{ medicamentos.previous_page_number }}">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-            </li>
-        {% endif %}
-        
-        {% for num in medicamentos.paginator.page_range %}
-            {% if medicamentos.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-            {% elif num > medicamentos.number|add:'-3' and num < medicamentos.number|add:'3' %}
-                <li class="page-item">
-                    <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.tipo %}tipo={{ request.GET.tipo }}&{% endif %}{% if request.GET.requiere_receta %}requiere_receta={{ request.GET.requiere_receta }}&{% endif %}page={{ num }}">{{ num }}</a>
-                </li>
-            {% endif %}
-        {% endfor %}
-        
-        {% if medicamentos.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.tipo %}tipo={{ request.GET.tipo }}&{% endif %}{% if request.GET.requiere_receta %}requiere_receta={{ request.GET.requiere_receta }}&{% endif %}page={{ medicamentos.next_page_number }}">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
 <!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    Confirmar Eliminación
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
             </div>
-            <div class="modal-body">
-                <p>¿Está seguro de que desea eliminar este medicamento?</p>
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Confirmar Eliminación</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">¿Está seguro de que desea eliminar este medicamento?</p>
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <p><strong>Medicamento:</strong> <span id="medicamento-name"></span></p>
+                <p class="mt-4 text-sm"><strong>Medicamento:</strong> <span id="medicamento-name"></span></p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <div class="items-center px-4 py-3">
+                <button id="cancelDelete" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancelar
+                </button>
                 <form id="delete-form" method="POST" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-2"></i>
-                        Eliminar Medicamento
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Eliminar
                     </button>
                 </form>
             </div>
@@ -385,80 +494,52 @@
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-    .medication-icon {
-        width: 40px;
-        text-align: center;
-    }
-    
-    .btn-group .btn {
-        border-radius: 0.375rem;
-        margin-right: 2px;
-    }
-    
-    .btn-group .btn:last-child {
-        margin-right: 0;
-    }
-    
-    .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-</style>
-{% endblock %}
-
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // View toggle functionality
-        const viewTable = document.getElementById('view-table');
-        const viewGrid = document.getElementById('view-grid');
-        const tableView = document.getElementById('table-view');
-        const gridView = document.getElementById('grid-view');
+document.addEventListener('DOMContentLoaded', function() {
+    // View toggle functionality
+    const viewTable = document.getElementById('view-table');
+    const viewGrid = document.getElementById('view-grid');
+    const tableView = document.getElementById('table-view');
+    const gridView = document.getElementById('grid-view');
+    
+    viewTable.addEventListener('click', function() {
+        this.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+        this.classList.remove('text-gray-500');
+        viewGrid.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+        viewGrid.classList.add('text-gray-500');
         
-        viewTable.addEventListener('change', function() {
-            if (this.checked) {
-                tableView.style.display = 'block';
-                gridView.style.display = 'none';
-            }
-        });
-        
-        viewGrid.addEventListener('change', function() {
-            if (this.checked) {
-                tableView.style.display = 'none';
-                gridView.style.display = 'block';
-            }
-        });
-        
-        // Auto-submit search form on filter change
-        const filterSelects = document.querySelectorAll('#tipo, #requiere_receta');
-        filterSelects.forEach(select => {
-            select.addEventListener('change', function() {
-                this.form.submit();
-            });
-        });
-        
-        // Search input with debounce
-        const searchInput = document.getElementById('search');
-        let searchTimeout;
-        
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                // Auto-submit after 1 second of no typing
-                // this.form.submit();
-            }, 1000);
-        });
+        tableView.classList.remove('hidden');
+        gridView.classList.add('hidden');
     });
     
-    function confirmDelete(medicamentoId, medicamentoName) {
-        document.getElementById('medicamento-name').textContent = medicamentoName;
-        document.getElementById('delete-form').action = `/medicamentos/${medicamentoId}/delete/`;
+    viewGrid.addEventListener('click', function() {
+        this.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+        this.classList.remove('text-gray-500');
+        viewTable.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+        viewTable.classList.add('text-gray-500');
         
-        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        modal.show();
-    }
+        tableView.classList.add('hidden');
+        gridView.classList.remove('hidden');
+    });
+    
+    // Auto-submit search form on filter change
+    const filterSelects = document.querySelectorAll('#stock_bajo');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+
+function confirmDelete(medicamentoId, medicamentoName) {
+    document.getElementById('medicamento-name').textContent = medicamentoName;
+    document.getElementById('delete-form').action = `/medicamentos/${medicamentoId}/delete/`;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', function() {
+    document.getElementById('deleteModal').classList.add('hidden');
+});
 </script>
 {% endblock %}
