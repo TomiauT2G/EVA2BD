@@ -57,7 +57,7 @@
                                 <option value="">Seleccionar consulta...</option>
                                 {% for consulta in consultas %}
                                     <option value="{{ consulta.id }}" 
-                                            {% if consulta.id == receta.consulta.id %}selected{% endif %}
+                                            {% if consulta.id == receta.tratamiento.consulta.id %}selected{% endif %}
                                             data-paciente="{{ consulta.paciente.nombre }} {{ consulta.paciente.apellido }}"
                                             data-medico="Dr. {{ consulta.medico.nombre }} {{ consulta.medico.apellido }}"
                                             data-fecha="{{ consulta.fecha|date:'d/m/Y' }}"
@@ -116,12 +116,12 @@
                         </h6>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div class="space-y-2">
-                                <p><span class="font-semibold text-gray-700">Paciente:</span> <span class="text-gray-900">{{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</span></p>
-                                <p><span class="font-semibold text-gray-700">Médico:</span> <span class="text-gray-900">Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Paciente:</span> <span class="text-gray-900">{{ receta.tratamiento.consulta.paciente.nombre }} {{ receta.tratamiento.consulta.paciente.apellido }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Médico:</span> <span class="text-gray-900">Dr. {{ receta.tratamiento.consulta.medico.nombre }} {{ receta.tratamiento.consulta.medico.apellido }}</span></p>
                             </div>
                             <div class="space-y-2">
-                                <p><span class="font-semibold text-gray-700">Fecha:</span> <span class="text-gray-900">{{ receta.consulta.fecha|date:"d/m/Y" }}</span></p>
-                                <p><span class="font-semibold text-gray-700">Diagnóstico:</span> <span class="text-gray-900">{{ receta.consulta.diagnostico }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Fecha:</span> <span class="text-gray-900">{{ receta.tratamiento.consulta.fecha_consulta|date:"d/m/Y" }}</span></p>
+                                <p><span class="font-semibold text-gray-700">Diagnóstico:</span> <span class="text-gray-900">{{ receta.tratamiento.consulta.diagnostico }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -636,9 +636,9 @@
             <div class="preview-section">
                 <div class="preview-header text-lg font-semibold text-gray-900 mb-3">RECETA MÉDICA</div>
                 <div class="space-y-2 text-sm">
-                    <p class="text-gray-700"><strong>Paciente:</strong> {{ receta.consulta.paciente.nombre }} {{ receta.consulta.paciente.apellido }}</p>
-                    <p class="text-gray-700"><strong>Médico:</strong> Dr. {{ receta.consulta.medico.nombre }} {{ receta.consulta.medico.apellido }}</p>
-                    <p class="text-gray-700"><strong>Fecha:</strong> {{ receta.consulta.fecha|date:"d/m/Y" }}</p>
+                    <p class="text-gray-700"><strong>Paciente:</strong> {{ receta.tratamiento.consulta.paciente.nombre }} {{ receta.tratamiento.consulta.paciente.apellido }}</p>
+                    <p class="text-gray-700"><strong>Médico:</strong> Dr. {{ receta.tratamiento.consulta.medico.nombre }} {{ receta.tratamiento.consulta.medico.apellido }}</p>
+                    <p class="text-gray-700"><strong>Fecha:</strong> {{ receta.tratamiento.consulta.fecha_consulta|date:"d/m/Y" }}</p>
                     <p class="text-gray-700"><strong>Válida hasta:</strong> ${fechaVencimiento.value ? new Date(fechaVencimiento.value).toLocaleDateString('es-ES') : 'No especificada'}</p>
                 </div>
             </div>

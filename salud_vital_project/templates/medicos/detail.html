@@ -113,7 +113,7 @@
                 </a>
             </div>
             <div class="card-body">
-                {% if medico.consultamedica_set.all %}
+                {% if medico.consultas_realizadas.all %}
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
@@ -126,7 +126,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for consulta in medico.consultamedica_set.all|slice:":5" %}
+                                {% for consulta in medico.consultas_realizadas.all|slice:":5" %}
                                 <tr>
                                     <td>
                                         <small class="text-muted">{{ consulta.fecha_consulta|date:"d/m/Y H:i" }}</small>
@@ -153,10 +153,10 @@
                             </tbody>
                         </table>
                     </div>
-                    {% if medico.consultamedica_set.count > 5 %}
+                    {% if medico.consultas_realizadas.count > 5 %}
                         <div class="text-center mt-3">
                             <a href="#" class="btn btn-outline-primary">
-                                Ver todas las consultas ({{ medico.consultamedica_set.count }})
+                                Ver todas las consultas ({{ medico.consultas_realizadas.count }})
                             </a>
                         </div>
                     {% endif %}
@@ -188,13 +188,13 @@
                 <div class="row text-center">
                     <div class="col-6 mb-3">
                         <div class="border rounded p-3">
-                            <h4 class="text-primary mb-1">{{ medico.consultamedica_set.count }}</h4>
+                            <h4 class="text-primary mb-1">{{ medico.consultas_realizadas.count }}</h4>
                             <small class="text-muted">Consultas</small>
                         </div>
                     </div>
                     <div class="col-6 mb-3">
                         <div class="border rounded p-3">
-                            <h4 class="text-success mb-1">{{ medico.consultamedica_set.all|length }}</h4>
+                            <h4 class="text-success mb-1">{{ medico.consultas_realizadas.all|length }}</h4>
                             <small class="text-muted">Pacientes</small>
                         </div>
                     </div>
@@ -212,11 +212,11 @@
                     </div>
                 </div>
                 
-                {% if medico.consultamedica_set.exists %}
+                {% if medico.consultas_realizadas.exists %}
                     <hr>
                     <div class="text-center">
                         <small class="text-muted">Última consulta:</small>
-                        <p class="fw-bold mb-0">{{ medico.consultamedica_set.first.fecha_consulta|date:"d/m/Y" }}</p>
+                        <p class="fw-bold mb-0">{{ medico.consultas_realizadas.first.fecha_consulta|date:"d/m/Y" }}</p>
                     </div>
                 {% endif %}
             </div>
@@ -262,7 +262,7 @@
             </div>
             <div class="card-body">
                 <div class="timeline">
-                    {% for consulta in medico.consultamedica_set.all|slice:":3" %}
+                    {% for consulta in medico.consultas_realizadas.all|slice:":3" %}
                         <div class="timeline-item">
                             <div class="timeline-marker bg-primary"></div>
                             <div class="timeline-content">
@@ -302,10 +302,10 @@
                 
                 <p>¿Está seguro que desea eliminar al médico <strong>Dr. {{ medico.nombre }} {{ medico.apellido }}</strong>?</p>
                 
-                {% if medico.consultamedica_set.count > 0 %}
+                {% if medico.consultas_realizadas.count > 0 %}
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-circle me-2"></i>
-                        <strong>Advertencia:</strong> Este médico tiene {{ medico.consultamedica_set.count }} consulta{{ medico.consultamedica_set.count|pluralize }} registrada{{ medico.consultamedica_set.count|pluralize }}. 
+                        <strong>Advertencia:</strong> Este médico tiene {{ medico.consultas_realizadas.count }} consulta{{ medico.consultas_realizadas.count|pluralize }} registrada{{ medico.consultas_realizadas.count|pluralize }}. 
                         Al eliminar este médico, también se eliminarán todos los registros médicos asociados.
                     </div>
                 {% endif %}

@@ -1,27 +1,41 @@
-# ==================== IMPORTS ====================
+# ============================================================================
+# IMPORTACIONES NECESARIAS
+# ============================================================================
+# Importaciones de Django REST Framework para crear APIs RESTful
+# Incluye viewsets, filtros, decoradores y respuestas
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+# Importaciones para filtrado avanzado con django-filter
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as django_filters
+
+# Importaciones de Django core para modelos, fechas y utilidades
 from django.db import models
 from datetime import datetime, timedelta
 
+# Importaciones para vistas basadas en plantillas HTML
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+
+# Importaciones para formularios Django
 from django.forms import ModelForm
 from django import forms
 from django.utils import timezone
 from datetime import date, datetime, timedelta
 
+# Importaciones de modelos locales del sistema de salud
 from .models import (
     Especialidad, Medico, Paciente, ConsultaMedica, 
     Tratamiento, Medicamento, RecetaMedica, CitaMedica, HistorialClinico
 )
+
+# Importaciones de serializadores para la API REST
 from .serializers import (
     EspecialidadSerializer, MedicoSerializer, PacienteSerializer,
     ConsultaMedicaSerializer, TratamientoSerializer, MedicamentoSerializer,
@@ -30,8 +44,14 @@ from .serializers import (
 )
 
 
-# ==================== FILTROS PARA API ====================
+# ============================================================================
+# FILTROS PERSONALIZADOS PARA LA API REST
+# ============================================================================
+# Estos filtros permiten búsquedas y filtrados avanzados en los endpoints de la API
+# Cada filtro está asociado a un modelo específico y define campos de búsqueda
+
 class MedicoFilter(django_filters.FilterSet):
+    """Filtro para búsqueda de médicos por especialidad, nombre y apellido"""
     especialidad = django_filters.CharFilter(field_name='especialidad__nombre', lookup_expr='icontains')
     nombre = django_filters.CharFilter(field_name='nombre', lookup_expr='icontains')
     apellido = django_filters.CharFilter(field_name='apellido', lookup_expr='icontains')
@@ -42,6 +62,7 @@ class MedicoFilter(django_filters.FilterSet):
 
 
 class PacienteFilter(django_filters.FilterSet):
+    """Filtro para búsqueda de pacientes por nombre, apellido y rango de edad"""
     nombre = django_filters.CharFilter(field_name='nombre', lookup_expr='icontains')
     apellido = django_filters.CharFilter(field_name='apellido', lookup_expr='icontains')
     edad_min = django_filters.NumberFilter(method='filter_edad_min')
@@ -63,6 +84,7 @@ class PacienteFilter(django_filters.FilterSet):
 
 
 class ConsultaMedicaFilter(django_filters.FilterSet):
+    """Filtro para búsqueda de consultas médicas por paciente, médico, especialidad y fechas"""
     paciente = django_filters.CharFilter(field_name='paciente__nombre', lookup_expr='icontains')
     medico = django_filters.CharFilter(field_name='medico__nombre', lookup_expr='icontains')
     especialidad = django_filters.CharFilter(field_name='medico__especialidad__nombre', lookup_expr='icontains')
@@ -75,6 +97,7 @@ class ConsultaMedicaFilter(django_filters.FilterSet):
 
 
 class MedicamentoFilter(django_filters.FilterSet):
+    """Filtro para búsqueda de medicamentos con alertas de stock bajo y próximo vencimiento"""
     nombre = django_filters.CharFilter(field_name='nombre', lookup_expr='icontains')
     stock_bajo = django_filters.BooleanFilter(method='filter_stock_bajo')
     proximo_vencimiento = django_filters.BooleanFilter(method='filter_proximo_vencimiento')
@@ -96,8 +119,14 @@ class MedicamentoFilter(django_filters.FilterSet):
         return queryset.filter(fecha_vencimiento__gt=fecha_limite)
 
 
-# ==================== API VIEWSETS ====================
+# ============================================================================
+# VIEWSETS PARA LA API REST
+# ============================================================================
+# Estos viewsets proporcionan endpoints CRUD completos para cada modelo
+# Incluyen funcionalidades de filtrado, búsqueda, ordenamiento y acciones personalizadas
+
 class EspecialidadViewSet(viewsets.ModelViewSet):
+    """ViewSet para gestionar especialidades médicas a través de la API REST"""
     queryset = Especialidad.objects.all()
     serializer_class = EspecialidadSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -107,6 +136,7 @@ class EspecialidadViewSet(viewsets.ModelViewSet):
 
 
 class MedicoViewSet(viewsets.ModelViewSet):
+    """ViewSet para gestionar médicos con filtrado por especialidad y acciones personalizadas"""
     queryset = Medico.objects.select_related('especialidad')
     serializer_class = MedicoSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -124,12 +154,13 @@ class MedicoViewSet(viewsets.ModelViewSet):
     def consultas(self, request, pk=None):
         """Obtener consultas de un médico específico"""
         medico = self.get_object()
-        consultas = medico.consultamedica_set.all()
+        consultas = medico.consultas_realizadas.all()
         serializer = ConsultaMedicaSerializer(consultas, many=True)
         return Response(serializer.data)
 
 
 class PacienteViewSet(viewsets.ModelViewSet):
+    """ViewSet para gestionar pacientes con filtrado por edad y datos personales"""
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -236,14 +267,27 @@ class RecetaMedicaViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
 
-# ==================== FORMULARIOS PARA PLANTILLAS ====================
+# ============================================================================
+# FORMULARIOS PARA VISTAS BASADAS EN PLANTILLAS HTML
+# ============================================================================
+# Estos formularios definen la estructura y validación para las vistas web
+# Incluyen estilos CSS personalizados con Tailwind CSS para una interfaz moderna
+
 class EspecialidadForm(ModelForm):
+    """Formulario para crear y editar especialidades médicas"""
     class Meta:
         model = Especialidad
         fields = ['nombre', 'descripcion']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Cardiología'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción de la especialidad...'}),
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'Ej: Cardiología'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 3,
+                'placeholder': 'Descripción de la especialidad...'
+            }),
         }
 
 class PacienteForm(ModelForm):
@@ -251,13 +295,35 @@ class PacienteForm(ModelForm):
         model = Paciente
         fields = ['rut', 'nombre', 'apellido', 'fecha_nacimiento', 'telefono', 'email', 'direccion']
         widgets = {
-            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del paciente'}),
-            'apellido': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido del paciente'}),
-            'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56 9 1234 5678'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
-            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Dirección completa'}),
+            'rut': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': '12.345.678-9'
+            }),
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'Nombre del paciente'
+            }),
+            'apellido': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'Apellido del paciente'
+            }),
+            'fecha_nacimiento': forms.DateInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'type': 'date'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': '+56 9 1234 5678'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'correo@ejemplo.com'
+            }),
+            'direccion': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 2,
+                'placeholder': 'Dirección completa'
+            }),
         }
 
 class MedicoForm(ModelForm):
@@ -265,13 +331,32 @@ class MedicoForm(ModelForm):
         model = Medico
         fields = ['rut', 'nombre', 'apellido', 'telefono', 'email', 'especialidad', 'activo']
         widgets = {
-            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del médico'}),
-            'apellido': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido del médico'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56 9 1234 5678'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
-            'especialidad': forms.Select(attrs={'class': 'form-select'}),
-            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'rut': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': '12.345.678-9'
+            }),
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'Nombre del médico'
+            }),
+            'apellido': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'Apellido del médico'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': '+56 9 1234 5678'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'placeholder': 'correo@ejemplo.com'
+            }),
+            'especialidad': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200'
+            }),
+            'activo': forms.CheckboxInput(attrs={
+                'class': 'w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2'
+            }),
         }
 
 class ConsultaForm(forms.ModelForm):
@@ -279,12 +364,31 @@ class ConsultaForm(forms.ModelForm):
         model = ConsultaMedica
         fields = ['paciente', 'medico', 'cita', 'fecha_consulta', 'motivo', 'diagnostico']
         widgets = {
-            'paciente': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'medico': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'cita': forms.Select(attrs={'class': 'form-select'}),
-            'fecha_consulta': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local', 'required': True}),
-            'motivo': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'required': True}),
-            'diagnostico': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'paciente': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'medico': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'cita': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200'
+            }),
+            'fecha_consulta': forms.DateTimeInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'type': 'datetime-local',
+                'required': True
+            }),
+            'motivo': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 4,
+                'required': True
+            }),
+            'diagnostico': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 4
+            }),
         }
 
 class TratamientoForm(forms.ModelForm):
@@ -292,10 +396,24 @@ class TratamientoForm(forms.ModelForm):
         model = Tratamiento
         fields = ['consulta', 'descripcion', 'fecha_inicio', 'fecha_fin']
         widgets = {
-            'consulta': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'required': True}),
-            'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'required': True}),
-            'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'consulta': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 4,
+                'required': True
+            }),
+            'fecha_inicio': forms.DateInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'type': 'date',
+                'required': True
+            }),
+            'fecha_fin': forms.DateInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'type': 'date'
+            }),
         }
 
 class MedicamentoForm(forms.ModelForm):
@@ -303,11 +421,30 @@ class MedicamentoForm(forms.ModelForm):
         model = Medicamento
         fields = ['nombre', 'descripcion', 'stock', 'precio_unitario', 'fecha_vencimiento']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'stock': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'required': True}),
-            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'required': True}),
-            'fecha_vencimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'required': True}),
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'rows': 3
+            }),
+            'stock': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'min': 0,
+                'required': True
+            }),
+            'precio_unitario': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'step': '0.01',
+                'min': '0',
+                'required': True
+            }),
+            'fecha_vencimiento': forms.DateInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'type': 'date',
+                'required': True
+            }),
         }
 
 class RecetaMedicaForm(forms.ModelForm):
@@ -315,18 +452,41 @@ class RecetaMedicaForm(forms.ModelForm):
         model = RecetaMedica
         fields = ['tratamiento', 'medicamento', 'cantidad', 'frecuencia', 'duracion']
         widgets = {
-            'tratamiento': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'medicamento': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'required': True}),
-            'frecuencia': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'duracion': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
+            'tratamiento': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'medicamento': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'cantidad': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'min': 1,
+                'required': True
+            }),
+            'frecuencia': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
+            'duracion': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
+                'required': True
+            }),
         }
 
 
-# ==================== VISTAS DE PLANTILLAS ====================
+# ============================================================================
+# VISTAS BASADAS EN PLANTILLAS HTML
+# ============================================================================
+# Estas vistas manejan la interfaz web del sistema, proporcionando páginas HTML
+# completas con funcionalidades CRUD, paginación, búsqueda y filtrado
 
-# Dashboard View
+# ============================================================================
+# DASHBOARD PRINCIPAL
+# ============================================================================
 def dashboard(request):
+    """Vista principal del dashboard con estadísticas generales del sistema"""
     """Vista principal del dashboard"""
     # Estadísticas generales
     total_pacientes = Paciente.objects.count()
@@ -362,9 +522,14 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
-# ==================== ESPECIALIDADES ====================
+# ============================================================================
+# GESTIÓN DE ESPECIALIDADES MÉDICAS
+# ============================================================================
+# Vistas para el manejo completo de especialidades: listado, creación, 
+# visualización, edición y eliminación
 
 def especialidades_list(request):
+    """Vista para listar todas las especialidades con búsqueda y paginación"""
     """Lista de especialidades"""
     search = request.GET.get('search', '')
     especialidades = Especialidad.objects.all()
@@ -459,9 +624,14 @@ def especialidades_delete(request, pk):
     return redirect('especialidades_list')
 
 
-# ==================== PACIENTES ====================
+# ============================================================================
+# GESTIÓN DE PACIENTES
+# ============================================================================
+# Vistas para el manejo completo de pacientes: listado con filtros avanzados,
+# creación, visualización de perfil, edición y eliminación
 
 def pacientes_list(request):
+    """Vista para listar pacientes con filtros por nombre, apellido y grupo sanguíneo"""
     """Lista de pacientes"""
     search = request.GET.get('search', '')
     
@@ -560,17 +730,48 @@ def pacientes_delete(request, pk):
     nombre = f"{paciente.nombre} {paciente.apellido}"
     
     try:
+        # Verificar si el paciente tiene registros relacionados
+        citas_count = paciente.citas.count()
+        consultas_count = paciente.consultas.count()
+        
+        if citas_count > 0 or consultas_count > 0:
+            # Eliminar registros relacionados en orden correcto
+            # Primero eliminar recetas médicas (relacionadas con tratamientos)
+            for consulta in paciente.consultas.all():
+                for tratamiento in consulta.tratamientos.all():
+                    tratamiento.recetas.all().delete()
+                    tratamiento.delete()
+                consulta.delete()
+            
+            # Eliminar citas médicas
+            paciente.citas.all().delete()
+            
+            # Eliminar historial clínico si existe
+            if hasattr(paciente, 'historial_clinico'):
+                paciente.historial_clinico.delete()
+        
+        # Finalmente eliminar el paciente
         paciente.delete()
-        messages.success(request, f'Paciente "{nombre}" eliminado exitosamente.')
+        
+        if citas_count > 0 or consultas_count > 0:
+            messages.success(request, f'Paciente "{nombre}" y todos sus registros relacionados ({citas_count} citas, {consultas_count} consultas) eliminados exitosamente.')
+        else:
+            messages.success(request, f'Paciente "{nombre}" eliminado exitosamente.')
+            
     except Exception as e:
         messages.error(request, f'Error al eliminar el paciente: {str(e)}')
     
     return redirect('pacientes_list')
 
 
-# ==================== MÉDICOS ====================
+# ============================================================================
+# GESTIÓN DE MÉDICOS
+# ============================================================================
+# Vistas para el manejo completo de médicos: listado con filtros por especialidad,
+# creación, visualización de perfil, edición y eliminación
 
 def medicos_list(request):
+    """Vista para listar médicos con filtros por especialidad y estado activo"""
     """Lista de médicos"""
     search = request.GET.get('search', '')
     especialidad = request.GET.get('especialidad', '')
@@ -626,7 +827,7 @@ def medicos_create(request):
 def medicos_detail(request, pk):
     """Detalle de médico"""
     medico = get_object_or_404(Medico, pk=pk)
-    consultas = medico.consultamedica_set.select_related(
+    consultas = medico.consultas_realizadas.select_related(
         'paciente'
     ).order_by('-fecha_consulta')
     
@@ -674,9 +875,14 @@ def medicos_delete(request, pk):
     return redirect('medicos_list')
 
 
-# ==================== CONSULTAS MÉDICAS ====================
+# ============================================================================
+# GESTIÓN DE CONSULTAS MÉDICAS
+# ============================================================================
+# Vistas para el manejo de consultas médicas: listado con filtros por fecha,
+# médico y paciente, creación, visualización y edición
 
 def consultas_list(request):
+    """Vista para listar consultas médicas con filtros avanzados por fecha y participantes"""
     """Lista de consultas médicas"""
     search = request.GET.get('search', '')
     medico = request.GET.get('medico', '')
@@ -788,9 +994,14 @@ def consultas_delete(request, pk):
     return redirect('consultas_list')
 
 
-# ==================== TRATAMIENTOS ====================
+# ============================================================================
+# GESTIÓN DE TRATAMIENTOS
+# ============================================================================
+# Vistas para el manejo de tratamientos médicos: listado con estado activo/inactivo,
+# creación, visualización y edición con fechas de seguimiento
 
 def tratamientos_list(request):
+    """Vista para listar tratamientos con filtros por estado y fechas"""
     """Lista de tratamientos"""
     search_query = request.GET.get('search', '')
     consulta_filter = request.GET.get('consulta', '')
@@ -896,9 +1107,14 @@ def tratamientos_delete(request, pk):
     return redirect('tratamientos_list')
 
 
-# ==================== MEDICAMENTOS ====================
+# ============================================================================
+# GESTIÓN DE MEDICAMENTOS
+# ============================================================================
+# Vistas para el manejo de inventario de medicamentos: listado con alertas de stock
+# bajo y vencimiento próximo, creación, visualización y edición
 
 def medicamentos_list(request):
+    """Vista para listar medicamentos con alertas de stock y vencimiento"""
     """Lista de medicamentos"""
     search = request.GET.get('search', '')
     stock_bajo = request.GET.get('stock_bajo', '')
@@ -1288,14 +1504,6 @@ def citas_delete(request, pk):
 
 class HistorialForm(forms.ModelForm):
     # Campos adicionales que no están en el modelo pero se necesitan en el template
-    tipo_sangre = forms.CharField(
-        max_length=5, 
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
-            'placeholder': 'Ej: O+, A-, B+, AB-'
-        })
-    )
     peso = forms.DecimalField(
         max_digits=5, 
         decimal_places=2, 
@@ -1372,9 +1580,8 @@ class HistorialForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
                 'required': True
             }),
-            'grupo_sanguineo': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
-                'placeholder': 'Ej: O+, A-, B+, AB-'
+            'grupo_sanguineo': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200'
             }),
             'alergias_conocidas': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200',
@@ -1391,10 +1598,6 @@ class HistorialForm(forms.ModelForm):
     def save(self, commit=True):
         # Solo guardamos los campos que están en el modelo
         instance = super().save(commit=False)
-        
-        # Mapear el campo tipo_sangre al campo grupo_sanguineo del modelo
-        if self.cleaned_data.get('tipo_sangre'):
-            instance.grupo_sanguineo = self.cleaned_data['tipo_sangre']
         
         # Mapear el campo alergias al campo alergias_conocidas del modelo
         if self.cleaned_data.get('alergias'):

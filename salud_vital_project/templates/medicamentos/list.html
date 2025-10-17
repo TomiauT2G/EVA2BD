@@ -530,16 +530,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.form.submit();
         });
     });
+    
+    // Cancel delete button event
+    document.getElementById('cancelDelete').addEventListener('click', function() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    });
 });
 
 function confirmDelete(medicamentoId, medicamentoName) {
     document.getElementById('medicamento-name').textContent = medicamentoName;
-    document.getElementById('delete-form').action = `/medicamentos/${medicamentoId}/delete/`;
+    document.getElementById('delete-form').action = `/medicamentos/${medicamentoId}/eliminar/`;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
-
-document.getElementById('cancelDelete').addEventListener('click', function() {
-    document.getElementById('deleteModal').classList.add('hidden');
-});
 </script>
 {% endblock %}

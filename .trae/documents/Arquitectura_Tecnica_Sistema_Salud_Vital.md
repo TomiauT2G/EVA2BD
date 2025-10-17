@@ -31,33 +31,38 @@ graph TD
 
 ## 2. Technology Description
 
-- **Backend**: Django@4.2 + Django REST Framework@3.14 + PostgreSQL
-- **Frontend**: Django Templates + Bootstrap@5.3 + JavaScript
-- **Documentation**: OpenAPI/Swagger + drf-spectacular
-- **Environment**: Python@3.11 + Virtual Environment (eva2)
-- **Database**: PostgreSQL@15 (password: 1983)
+* **Backend**: Django\@4.2 + Django REST Framework\@3.14 + PostgreSQL
+
+* **Frontend**: Django Templates + Bootstrap\@5.3 + JavaScript
+
+* **Documentation**: OpenAPI/Swagger + drf-spectacular
+
+* **Environment**: Python\@3.11 + Virtual Environment (eva2)
+
+* **Database**: PostgreSQL\@15 (password: 1983)
 
 ## 3. Route definitions
 
-| Route | Purpose |
-|-------|---------|
-| / | Dashboard principal con estadísticas y accesos rápidos |
-| /especialidades/ | Gestión CRUD de especialidades médicas |
-| /medicos/ | Gestión CRUD de médicos con filtros por especialidad |
-| /pacientes/ | Gestión CRUD de pacientes con búsqueda |
-| /consultas/ | Gestión de consultas médicas con filtros |
-| /tratamientos/ | Gestión de tratamientos asociados a consultas |
-| /medicamentos/ | Inventario de medicamentos con control de stock |
-| /recetas/ | Gestión de recetas médicas y prescripciones |
-| /api/ | Endpoints de la API REST |
-| /api/docs/ | Documentación OpenAPI/Swagger |
-| /admin/ | Panel de administración Django |
+| Route            | Purpose                                                |
+| ---------------- | ------------------------------------------------------ |
+| /                | Dashboard principal con estadísticas y accesos rápidos |
+| /especialidades/ | Gestión CRUD de especialidades médicas                 |
+| /medicos/        | Gestión CRUD de médicos con filtros por especialidad   |
+| /pacientes/      | Gestión CRUD de pacientes con búsqueda                 |
+| /consultas/      | Gestión de consultas médicas con filtros               |
+| /tratamientos/   | Gestión de tratamientos asociados a consultas          |
+| /medicamentos/   | Inventario de medicamentos con control de stock        |
+| /recetas/        | Gestión de recetas médicas y prescripciones            |
+| /api/            | Endpoints de la API REST                               |
+| /api/docs/       | Documentación OpenAPI/Swagger                          |
+| /admin/          | Panel de administración Django                         |
 
 ## 4. API definitions
 
 ### 4.1 Core API
 
 **Especialidades**
+
 ```
 GET /api/especialidades/
 POST /api/especialidades/
@@ -67,19 +72,22 @@ DELETE /api/especialidades/{id}/
 ```
 
 Request (POST/PUT):
-| Param Name | Param Type | isRequired | Description |
-|------------|------------|------------|-------------|
-| nombre | string | true | Nombre de la especialidad |
-| descripcion | string | false | Descripción de la especialidad |
+
+| Param Name  | Param Type | isRequired | Description                    |
+| ----------- | ---------- | ---------- | ------------------------------ |
+| nombre      | string     | true       | Nombre de la especialidad      |
+| descripcion | string     | false      | Descripción de la especialidad |
 
 Response:
-| Param Name | Param Type | Description |
-|------------|------------|-------------|
-| id | integer | ID único de la especialidad |
-| nombre | string | Nombre de la especialidad |
-| descripcion | string | Descripción de la especialidad |
+
+| Param Name  | Param Type | Description                    |
+| ----------- | ---------- | ------------------------------ |
+| id          | integer    | ID único de la especialidad    |
+| nombre      | string     | Nombre de la especialidad      |
+| descripcion | string     | Descripción de la especialidad |
 
 **Médicos**
+
 ```
 GET /api/medicos/
 POST /api/medicos/
@@ -90,15 +98,17 @@ GET /api/medicos/?especialidad={especialidad_id}
 ```
 
 Request (POST/PUT):
-| Param Name | Param Type | isRequired | Description |
-|------------|------------|------------|-------------|
-| rut | string | true | RUT del médico |
-| nombre | string | true | Nombre del médico |
-| apellido | string | true | Apellido del médico |
-| telefono | string | false | Teléfono de contacto |
-| especialidad_id | integer | true | ID de la especialidad |
+
+| Param Name       | Param Type | isRequired | Description           |
+| ---------------- | ---------- | ---------- | --------------------- |
+| rut              | string     | true       | RUT del médico        |
+| nombre           | string     | true       | Nombre del médico     |
+| apellido         | string     | true       | Apellido del médico   |
+| telefono         | string     | false      | Teléfono de contacto  |
+| especialidad\_id | integer    | true       | ID de la especialidad |
 
 **Pacientes**
+
 ```
 GET /api/pacientes/
 POST /api/pacientes/
@@ -109,16 +119,18 @@ GET /api/pacientes/?search={query}
 ```
 
 Request (POST/PUT):
-| Param Name | Param Type | isRequired | Description |
-|------------|------------|------------|-------------|
-| rut | string | true | RUT del paciente |
-| nombre | string | true | Nombre del paciente |
-| apellido | string | true | Apellido del paciente |
-| fecha_nacimiento | date | true | Fecha de nacimiento |
-| telefono | string | false | Teléfono de contacto |
-| direccion | string | false | Dirección del paciente |
+
+| Param Name        | Param Type | isRequired | Description            |
+| ----------------- | ---------- | ---------- | ---------------------- |
+| rut               | string     | true       | RUT del paciente       |
+| nombre            | string     | true       | Nombre del paciente    |
+| apellido          | string     | true       | Apellido del paciente  |
+| fecha\_nacimiento | date       | true       | Fecha de nacimiento    |
+| telefono          | string     | false      | Teléfono de contacto   |
+| direccion         | string     | false      | Dirección del paciente |
 
 **Consultas Médicas**
+
 ```
 GET /api/consultas/
 POST /api/consultas/
@@ -129,6 +141,7 @@ GET /api/consultas/?medico={medico_id}&paciente={paciente_id}
 ```
 
 **Tratamientos**
+
 ```
 GET /api/tratamientos/
 POST /api/tratamientos/
@@ -139,6 +152,7 @@ GET /api/tratamientos/?consulta={consulta_id}
 ```
 
 **Medicamentos**
+
 ```
 GET /api/medicamentos/
 POST /api/medicamentos/
@@ -149,6 +163,7 @@ GET /api/medicamentos/?stock_bajo=true
 ```
 
 **Recetas Médicas**
+
 ```
 GET /api/recetas/
 POST /api/recetas/
@@ -263,6 +278,7 @@ erDiagram
 ### 6.2 Data Definition Language
 
 **Tabla Especialidades**
+
 ```sql
 -- Crear tabla especialidades
 CREATE TABLE especialidades (
@@ -283,6 +299,7 @@ INSERT INTO especialidades (nombre, descripcion) VALUES
 ```
 
 **Tabla Médicos**
+
 ```sql
 -- Crear tabla médicos
 CREATE TABLE medicos (
@@ -303,6 +320,7 @@ CREATE INDEX idx_medicos_rut ON medicos(rut);
 ```
 
 **Tabla Pacientes**
+
 ```sql
 -- Crear tabla pacientes
 CREATE TABLE pacientes (
@@ -323,6 +341,7 @@ CREATE INDEX idx_pacientes_nombre ON pacientes(nombre, apellido);
 ```
 
 **Tabla Consultas Médicas**
+
 ```sql
 -- Crear tabla consultas médicas
 CREATE TABLE consultas_medicas (
@@ -344,6 +363,7 @@ CREATE INDEX idx_consultas_fecha ON consultas_medicas(fecha_consulta);
 ```
 
 **Tabla Tratamientos**
+
 ```sql
 -- Crear tabla tratamientos
 CREATE TABLE tratamientos (
@@ -363,6 +383,7 @@ CREATE INDEX idx_tratamientos_fechas ON tratamientos(fecha_inicio, fecha_fin);
 ```
 
 **Tabla Medicamentos**
+
 ```sql
 -- Crear tabla medicamentos
 CREATE TABLE medicamentos (
@@ -389,6 +410,7 @@ INSERT INTO medicamentos (nombre, descripcion, stock, precio_unitario, fecha_ven
 ```
 
 **Tabla Recetas Médicas**
+
 ```sql
 -- Crear tabla recetas médicas
 CREATE TABLE recetas_medicas (
@@ -408,3 +430,4 @@ CREATE TABLE recetas_medicas (
 CREATE INDEX idx_recetas_tratamiento ON recetas_medicas(tratamiento_id);
 CREATE INDEX idx_recetas_medicamento ON recetas_medicas(medicamento_id);
 ```
+

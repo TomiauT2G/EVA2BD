@@ -10,172 +10,256 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+# ============================================================================
+# IMPORTACIONES NECESARIAS
+# ============================================================================
+# Módulo para manejo de rutas de archivos multiplataforma
 from pathlib import Path
+# Biblioteca para leer variables de entorno desde archivos .env
 from decouple import config
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ============================================================================
+# CONFIGURACIÓN DE RUTAS DEL PROYECTO
+# ============================================================================
+# Directorio base del proyecto - ruta absoluta al directorio raíz
+# Se construye navegando dos niveles arriba desde este archivo
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# ============================================================================
+# CONFIGURACIÓN DE SEGURIDAD
+# ============================================================================
+# ADVERTENCIA DE SEGURIDAD: mantener la clave secreta en producción como secreto!
+# Esta clave se usa para firmar cookies, tokens CSRF y otros datos sensibles
 SECRET_KEY = 'django-insecure-&ly73&avy4c6q%($y##=08akazc88!ntaisjffotd7_#30u5-z'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# ADVERTENCIA DE SEGURIDAD: no ejecutar con debug activado en producción!
+# En producción debe ser False para evitar mostrar información sensible
 DEBUG = True
 
+# Lista de hosts/dominios que pueden servir este sitio Django
+# '*' permite cualquier host (solo para desarrollo)
 ALLOWED_HOSTS = ['*']
 
 
-# Application definition
-
+# ============================================================================
+# DEFINICIÓN DE APLICACIONES INSTALADAS
+# ============================================================================
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # ========================================================================
+    # APLICACIONES CORE DE DJANGO
+    # ========================================================================
+    'django.contrib.admin',          # Panel de administración
+    'django.contrib.auth',           # Sistema de autenticación
+    'django.contrib.contenttypes',   # Framework de tipos de contenido
+    'django.contrib.sessions',       # Framework de sesiones
+    'django.contrib.messages',       # Framework de mensajes
+    'django.contrib.staticfiles',    # Manejo de archivos estáticos
     
-    # Third party apps
-    'rest_framework',
-    'corsheaders',
-    'django_filters',
-    'drf_spectacular',
+    # ========================================================================
+    # APLICACIONES DE TERCEROS
+    # ========================================================================
+    'rest_framework',     # Django REST Framework para APIs
+    'corsheaders',        # Manejo de CORS para APIs
+    'django_filters',     # Filtros avanzados para APIs
+    'drf_spectacular',    # Documentación automática de APIs (Swagger/OpenAPI)
     
-    # Local apps
-    'salud_vital',
+    # ========================================================================
+    # APLICACIONES LOCALES DEL PROYECTO
+    # ========================================================================
+    'salud_vital',        # Aplicación principal del sistema médico
 ]
 
+# ============================================================================
+# CONFIGURACIÓN DE MIDDLEWARE
+# ============================================================================
+# Lista de middleware que procesa las peticiones HTTP en orden
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',           # Manejo de CORS (debe ir primero)
+    'django.middleware.security.SecurityMiddleware',   # Configuraciones de seguridad
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Manejo de sesiones
+    'django.middleware.common.CommonMiddleware',       # Funcionalidades comunes
+    'django.middleware.csrf.CsrfViewMiddleware',       # Protección CSRF
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Autenticación
+    'django.contrib.messages.middleware.MessageMiddleware',     # Sistema de mensajes
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',   # Protección clickjacking
 ]
 
+# ============================================================================
+# CONFIGURACIÓN DE URLs
+# ============================================================================
+# Módulo raíz de configuración de URLs del proyecto
 ROOT_URLCONF = 'salud_vital_project.urls'
 
+# ============================================================================
+# CONFIGURACIÓN DE TEMPLATES
+# ============================================================================
 TEMPLATES = [
     {
+        # Motor de templates de Django
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        
+        # Directorios donde buscar templates personalizados
         'DIRS': [BASE_DIR / 'salud_vital_project' / 'templates'],
+        
+        # Buscar templates en directorios 'templates' de cada app
         'APP_DIRS': True,
+        
+        # Opciones adicionales del motor de templates
         'OPTIONS': {
+            # Procesadores de contexto que añaden variables a todos los templates
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',    # Variables de debug
+                'django.template.context_processors.request',  # Objeto request
+                'django.contrib.auth.context_processors.auth', # Usuario autenticado
+                'django.contrib.messages.context_processors.messages',  # Mensajes
             ],
         },
     },
 ]
 
+# ============================================================================
+# CONFIGURACIÓN DE WSGI
+# ============================================================================
+# Aplicación WSGI para el servidor web en producción
 WSGI_APPLICATION = 'salud_vital_project.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# ============================================================================
+# CONFIGURACIÓN DE BASE DE DATOS
+# ============================================================================
+# Configuración de PostgreSQL con variables de entorno para seguridad
 DATABASES = {
     'default': {
+        # Motor de base de datos PostgreSQL
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='salud_vital_db'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default='1983'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+        
+        # Configuraciones obtenidas desde variables de entorno (.env)
+        'NAME': config('DB_NAME', default='salud_vital_db'),      # Nombre de la BD
+        'USER': config('DB_USER', default='postgres'),           # Usuario de la BD
+        'PASSWORD': config('DB_PASSWORD', default='1983'),       # Contraseña de la BD
+        'HOST': config('DB_HOST', default='localhost'),          # Host de la BD
+        'PORT': config('DB_PORT', default='5432'),               # Puerto de la BD
+        
+        # Opciones adicionales de conexión
         'OPTIONS': {
-            'client_encoding': 'UTF8',
+            'client_encoding': 'UTF8',  # Codificación de caracteres
         },
     }
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# ============================================================================
+# VALIDADORES DE CONTRASEÑAS
+# ============================================================================
+# Validadores que aseguran contraseñas seguras para los usuarios
 AUTH_PASSWORD_VALIDATORS = [
     {
+        # Evita contraseñas similares a información del usuario
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
+        # Requiere longitud mínima de contraseña
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
+        # Evita contraseñas comunes y fáciles de adivinar
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
+        # Evita contraseñas completamente numéricas
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
+# ============================================================================
+# CONFIGURACIÓN DE INTERNACIONALIZACIÓN
+# ============================================================================
+# Idioma por defecto del sistema (español de Chile)
 LANGUAGE_CODE = 'es-cl'
 
+# Zona horaria del sistema (Santiago, Chile)
 TIME_ZONE = 'America/Santiago'
 
+# Habilitar sistema de internacionalización
 USE_I18N = True
 
+# Usar zonas horarias en el sistema
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+# ============================================================================
+# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y MEDIA
+# ============================================================================
+# URL base para servir archivos estáticos (CSS, JS, imágenes del sitio)
 STATIC_URL = 'static/'
+# Directorio donde se recopilan todos los archivos estáticos en producción
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# URL base para servir archivos media (archivos subidos por usuarios)
 MEDIA_URL = 'media/'
+# Directorio donde se almacenan los archivos media
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
+# ============================================================================
+# CONFIGURACIÓN DE MODELOS
+# ============================================================================
+# Tipo de campo de clave primaria por defecto para nuevos modelos
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework
+# ============================================================================
+# CONFIGURACIÓN DE DJANGO REST FRAMEWORK
+# ============================================================================
 REST_FRAMEWORK = {
+    # Clases de autenticación por defecto
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # Autenticación por sesión
+        'rest_framework.authentication.BasicAuthentication',    # Autenticación básica HTTP
     ],
+    
+    # Permisos por defecto (requiere autenticación)
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    
+    # Configuración de paginación
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    'PAGE_SIZE': 20,  # 20 elementos por página
+    
+    # Backends de filtrado por defecto
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
+        'django_filters.rest_framework.DjangoFilterBackend',  # Filtros personalizados
+        'rest_framework.filters.SearchFilter',               # Búsqueda de texto
+        'rest_framework.filters.OrderingFilter',             # Ordenamiento
     ],
+    
+    # Esquema para documentación automática
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# DRF Spectacular (OpenAPI/Swagger)
+# ============================================================================
+# CONFIGURACIÓN DE DOCUMENTACIÓN API (DRF SPECTACULAR)
+# ============================================================================
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Salud Vital API',
-    'DESCRIPTION': 'Sistema de Administración Médica - Salud Vital Ltda.',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/',
+    'TITLE': 'Salud Vital API',                                    # Título de la API
+    'DESCRIPTION': 'Sistema de Administración Médica - Salud Vital Ltda.',  # Descripción
+    'VERSION': '1.0.0',                                           # Versión de la API
+    'SERVE_INCLUDE_SCHEMA': False,                                # No incluir esquema en respuestas
+    'COMPONENT_SPLIT_REQUEST': True,                              # Separar componentes de request
+    'SCHEMA_PATH_PREFIX': '/api/',                                # Prefijo de rutas de API
 }
 
-# CORS settings
+# ============================================================================
+# CONFIGURACIÓN DE CORS (Cross-Origin Resource Sharing)
+# ============================================================================
+# Permitir peticiones desde cualquier origen (solo para desarrollo)
 CORS_ALLOW_ALL_ORIGINS = True
+# Permitir envío de credenciales en peticiones CORS
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings for development
+# ============================================================================
+# CONFIGURACIÓN DE SEGURIDAD PARA DESARROLLO
+# ============================================================================
+# Orígenes confiables para tokens CSRF
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
